@@ -3,7 +3,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Architecture {
+
     private ArrayList<Node> nodes = new ArrayList<>();
+    private HashMap<String, Node> nodeMap = new HashMap<>();
     private ArrayList<Link> links = new ArrayList<>();
     private ArrayList<Stream> streams = new ArrayList<>();
     private int[][] graph;
@@ -21,6 +23,7 @@ public class Architecture {
 
     public void addNode(Node n) {
         nodes.add(n);
+        nodeMap.put(n.getName(), n);
     }
 
     public void addLink(Link l) {
@@ -41,6 +44,7 @@ public class Architecture {
                 this.graph[row][col] = -1;
             }
         }
+
         // add link ids. row indices are source node, column indices are destination node
         int startID;
         int destID;
@@ -55,5 +59,21 @@ public class Architecture {
 
     public int[][] getGraph() {
         return this.graph;
+    }
+
+    public Node getNodeByName(String name) {
+        return this.nodeMap.get(name);
+    }
+
+    public ArrayList<Node> getNodes() {
+        return nodes;
+    }
+
+    public ArrayList<Link> getLinks() {
+        return links;
+    }
+
+    public ArrayList<Stream> getStreams() {
+        return streams;
     }
 }

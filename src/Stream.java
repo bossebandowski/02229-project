@@ -8,14 +8,16 @@ public class Stream {
     private int size;
     private int period;
     private int deadline;
+    private int rl;
 
-    public Stream(String name, Node source, Node destination, int size, int period, int deadline) {
+    public Stream(String name, Node source, Node destination, int size, int period, int deadline, int rl) {
         this.name = name;
         this.source = source;
         this.destination = destination;
         this.size = size;
         this.period = period;
         this.deadline = deadline;
+        this.rl = rl;
         this.id = count;
         count++;
     }
