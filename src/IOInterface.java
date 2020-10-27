@@ -57,7 +57,7 @@ public class IOInterface {
             size = Integer.parseInt(e.getAttribute("size"));
             period = Integer.parseInt(e.getAttribute("period"));
             deadline = Integer.parseInt(e.getAttribute("deadline"));
-            rl = Integer.parseInt(e.getAttribute("size"));
+            rl = Integer.parseInt(e.getAttribute("rl"));
             this.architecture.addStream(new Stream(name, src, dest, size, period, deadline, rl));
         }
     }

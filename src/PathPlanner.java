@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class PathPlanner {
     public static String pathIn;
     public static String pathOut;
@@ -23,6 +26,8 @@ public class PathPlanner {
         architecture.buildGraph();
 
         // built initial solution
+        SolutionBuilder sb = new BfsSolutionBuilder(architecture);
+        List<List<Integer>> initSol = sb.builtSolution();
 
         // run optimization
 

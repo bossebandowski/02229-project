@@ -28,6 +28,7 @@ public class Architecture {
 
     public void addLink(Link l) {
         links.add(l);
+        l.getStart().addChild(l.getEnd());
     }
 
     public void addStream(Stream s) {
