@@ -7,8 +7,13 @@ import java.util.List;
 
 public abstract class MetaHeuristic {
 
-    float calculteCostFunction(Architecture architecture, List<List<Integer>> solution)
-    {
+    private Architecture a;
+
+    public MetaHeuristic(Architecture a) {
+        this.a = a;
+    }
+
+    float calculteCostFunction(Architecture architecture, List<List<Integer>> solution) {
         float result = 0.0f;
 
         final float bandwidthCoeff = 0.0f;
@@ -86,11 +91,6 @@ public abstract class MetaHeuristic {
 
 
         return  result;
-    }
-    private Architecture a;
-
-    public MetaHeuristic(Architecture a) {
-        this.a = a;
     }
 
     public boolean isViable(List<List<Integer>> solution) {
