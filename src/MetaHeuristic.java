@@ -42,10 +42,12 @@ public abstract class MetaHeuristic {
     }
 
     public List<List<Integer>> generateNeighborhood(List<List<Integer>> solutions, Integer numPaths){
+        //Generates a neighborhood for a random
         int[][] overlapGraph = initializeOverlapGraph(solutions);
 
-        //Generate neighborhood to route at index 0
-        List<Integer> shortestPath = solutions.get(0);
+        //Picks random route in solution list to work on
+        int ranSolutionIndex = new Random().nextInt(solutions.size());
+        List<Integer> shortestPath = solutions.get(ranSolutionIndex);
 
 
         Node src = a.getNodes().get(shortestPath.get(0));
@@ -61,6 +63,13 @@ public abstract class MetaHeuristic {
             }
             shortestPaths.add(shortPath);
         }
+
+        //Choose a random path in the generated shortestPaths
+        int ranIndex = new Random().nextInt(numPaths);
+        List<Integer> newSolution = shortestPaths.get(ranIndex);
+
+        //Replace the random route with the new solution
+        solutions.set(ranSolutionIndex,newSolution);
 
         return shortestPaths;
     }
