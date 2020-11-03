@@ -77,4 +77,28 @@ public class Architecture {
     public ArrayList<Stream> getStreams() {
         return streams;
     }
+
+    public Stream getStreambyID(int streamID)
+    {
+        for (Stream stream : this.streams) {
+            if(streamID == stream.getId())
+            {
+                return stream;
+            }
+        }
+        System.err.println("The requested Stream does not found!");
+        return null;
+    }
+
+    public Link getLink(int startID, int endID)
+    {
+        for (Link link : this.links) {
+            if (link.getStart().getId() == startID && link.getEnd().getId() == endID)
+            {
+                return link;
+            }
+        }
+        System.err.println("There is no link in the architecture, which meets your requirement!");
+        return null;
+    }
 }

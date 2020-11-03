@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PathPlanner {
@@ -29,7 +30,7 @@ public class PathPlanner {
 //        SolutionBuilder sb = new BfsSolutionBuilder(architecture);
         SolutionBuilder sb = new AStarSolutionBuilder(architecture);
         List<List<Integer>> initSol = sb.builtSolution();
-
+        System.out.println(initSol);
         // run optimization
 
         // verify solution

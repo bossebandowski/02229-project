@@ -4,6 +4,7 @@ public class Link {
     private final Node end;
     private final float speed;
     private final int id;
+    private float c = 0f;
 
     private float leftoverbandwidth;
 
@@ -37,5 +38,12 @@ public class Link {
     public void addStream(Stream stream) {
         this.leftoverbandwidth -= stream.getBandwith();
 //        System.out.println(this.id + " has " + leftoverbandwidth + "byte/micro sec");
+    }
+    public float getC() {
+        return c;
+    }
+
+    public void setC(float c) {
+        this.c = c;
     }
 }
