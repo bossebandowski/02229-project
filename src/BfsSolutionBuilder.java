@@ -71,6 +71,7 @@ public class BfsSolutionBuilder extends SolutionBuilder {
 
         int count = 0;
         for (List<Integer> route : initSolution) {
+
             System.out.println("Route " + count);
             for (Integer i : route) {
                 System.out.print(a.getNodes().get(i).getName() + " -> ");
@@ -79,6 +80,9 @@ public class BfsSolutionBuilder extends SolutionBuilder {
             count++;
         }
 
-        return null;
+
+
+
+        return initSolution;
     }
 }
