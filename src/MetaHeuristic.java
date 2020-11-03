@@ -42,7 +42,7 @@ public abstract class MetaHeuristic {
     }
 
     public List<List<Integer>> generateNeighborhood(List<List<Integer>> solutions, Integer numPaths){
-        int[][] overlapGraph = initializeOverlapGraph(solutions,architecture);
+        int[][] overlapGraph = initializeOverlapGraph(solutions);
 
         //Generate neighborhood to route at index 0
         List<Integer> shortestPath = solutions.get(0);
