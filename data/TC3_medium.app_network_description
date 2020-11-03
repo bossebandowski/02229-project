@@ -1,4 +1,4 @@
-x<NetworkDescription>
+<NetworkDescription>
     <!-- Expected order: devices, links, streams-->
 
     <device name="ES1" type="EndSystem"/>

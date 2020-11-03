@@ -4,6 +4,7 @@ public class Link {
     private final Node end;
     private final float speed;
     private final int id;
+    private float c = 0f;
 
     public Link(Node start, Node end, float speed) {
         this.start = start;
@@ -27,5 +28,13 @@ public class Link {
 
     public int getId() {
         return id;
+    }
+
+    public float getC() {
+        return c;
+    }
+
+    public void setC(float c) {
+        this.c = c;
     }
 }
