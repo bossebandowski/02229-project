@@ -13,7 +13,7 @@ public abstract class MetaHeuristic {
         this.a = a;
     }
 
-    float calculteCostFunction(Architecture architecture, List<List<Integer>> solution) {
+    float calculateCostFunction(List<List<Integer>> solution) {
         float result = 0.0f;
 
         final float bandwidthCoeff = 0.0f;
@@ -23,7 +23,7 @@ public abstract class MetaHeuristic {
         final float overlappingCoeff = 0.0f;
 
         // Calculate free bandwidth of each link
-        ArrayList<Link> linkBuffer = architecture.getLinks();
+        ArrayList<Link> linkBuffer = this.a.getLinks();
         HashMap<Link,Float> linkCapacity = new HashMap<Link,Float>();
         for(Link link:linkBuffer)
         {
@@ -35,9 +35,9 @@ public abstract class MetaHeuristic {
             {
                 if(nodeID > 0)
                 {
-                    Link currentLink = architecture.getLink(solution.get(streamID).get(nodeID - 1),solution.get(streamID).get(nodeID));
-                    linkCapacity.put(currentLink, linkCapacity.get(currentLink) - (architecture.getStreambyID(streamID).getSize()
-                            / architecture.getStreambyID(streamID).getPeriod()));
+                    Link currentLink = this.a.getLink(solution.get(streamID).get(nodeID - 1),solution.get(streamID).get(nodeID));
+                    linkCapacity.put(currentLink, linkCapacity.get(currentLink) - (this.a.getStreambyID(streamID).getSize()
+                            / this.a.getStreambyID(streamID).getPeriod()));
                 }
             }
         }
@@ -50,11 +50,11 @@ public abstract class MetaHeuristic {
 
         // Calculate overlapping (number of common links of Streams with common start and end Node)
         HashMap<Integer,Integer> streamOverlaps = new HashMap<Integer,Integer>();
-        for(Stream currentStream:architecture.getStreams())
+        for(Stream currentStream:this.a.getStreams())
         {
             streamOverlaps.put(currentStream.getId(),0);
         }
-        ArrayList<Stream> streams = architecture.getStreams();
+        ArrayList<Stream> streams = this.a.getStreams();
         int k = 0;
         for(int i = 0; i < streams.size(); i++)
         {
