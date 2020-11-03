@@ -14,9 +14,9 @@ public class BfsSolutionBuilder extends SolutionBuilder {
         ArrayList<Integer> route = new ArrayList<>();
         route = new ArrayList<>();
         // keep track of shortest path between src node and other nodes
-        float[] shortest_path_time = new float[numNodes];
-        Arrays.fill(shortest_path_time, Float.MAX_VALUE);
-        shortest_path_time[src.getId()] = 0f;
+        int[] shortestPathLen = new int[numNodes];
+        Arrays.fill(shortestPathLen, Integer.MAX_VALUE);
+        shortestPathLen[src.getId()] = 0;
         // keep track of node parents in shortest path
         int[] parent_ids = new int[numNodes];
         Arrays.fill(parent_ids, -1);
@@ -29,10 +29,9 @@ public class BfsSolutionBuilder extends SolutionBuilder {
             Node n = queue.pop();
 
             for (Node child : n.getChildren()) {
-                Link l = this.a.getLinks().get(this.a.getGraph()[n.getId()][child.getId()]);
-                if(shortest_path_time[n.getId()] + 1/l.getSpeed() < shortest_path_time[child.getId()]) {
+                if(shortestPathLen[n.getId()] + 1 < shortestPathLen[child.getId()]) {
                     queue.add(child);
-                    shortest_path_time[child.getId()] = shortest_path_time[n.getId()] + 1/l.getSpeed();
+                    shortestPathLen[child.getId()] = shortestPathLen[n.getId()] + 1;
                     parent_ids[child.getId()] = n.getId();
                 }
             }
@@ -58,7 +57,6 @@ public class BfsSolutionBuilder extends SolutionBuilder {
             count_routes += s.getRl();
         }
 
-        System.out.println(count_routes);
         List<List<Integer>> initSolution = new ArrayList<>(count_routes);
 
         for (Stream s: this.a.getStreams()) {
@@ -66,8 +64,6 @@ public class BfsSolutionBuilder extends SolutionBuilder {
                 initSolution.add(this.builtSingleRoute(s));
             }
         }
-
-        System.out.println(initSolution.size());
 
         int count = 0;
         for (List<Integer> route : initSolution) {
@@ -79,9 +75,6 @@ public class BfsSolutionBuilder extends SolutionBuilder {
             System.out.println("|");
             count++;
         }
-
-
-
 
         return initSolution;
     }
