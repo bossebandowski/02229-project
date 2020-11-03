@@ -26,7 +26,8 @@ public class PathPlanner {
         architecture.buildGraph();
 
         // built initial solution
-        SolutionBuilder sb = new BfsSolutionBuilder(architecture);
+//        SolutionBuilder sb = new BfsSolutionBuilder(architecture);
+        SolutionBuilder sb = new AStarSolutionBuilder(architecture);
         List<List<Integer>> initSol = sb.builtSolution();
 
         // run optimization

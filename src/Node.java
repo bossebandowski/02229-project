@@ -8,6 +8,8 @@ public class Node {
     private boolean type; // type == true -> end system :: else -> switch
     private ArrayList<Node> children = new ArrayList<>();
 
+    private int weight;
+
     public Node(String name, boolean type) {
         this.name = name;
         this.type = type;
