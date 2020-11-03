@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import com.sun.org.apache.xerces.internal.impl.xpath.XPath;
 
 import java.util.*;
 
@@ -13,11 +12,12 @@ public abstract class MetaHeuristic {
 
     private Architecture a;
 
+
     public MetaHeuristic(Architecture a) {
         this.a = a;
     }
 
-    public int[][] initializeOverlapGraph(List<List<Integer>> solutions) {
+    public int[][] initializeOverlapGraph(List<List<Integer>> solution) {
         //Select route in current solution
 
         int[][] graph = new int[a.getGraph().length][a.getGraph()[0].length];
@@ -32,7 +32,7 @@ public abstract class MetaHeuristic {
             }
         }
 
-        for (List<Integer> route : solutions){
+        for (List<Integer> route : solution){
             for (int node = 0; node < route.size()-1;node++){
                 graph[route.get(node)][route.get(node+1)] +=1;
             }
@@ -40,15 +40,20 @@ public abstract class MetaHeuristic {
 
         return graph;
     }
+    
 
-    public List<List<Integer>> generateNeighborhood(List<List<Integer>> solutions, Integer numPaths){
+
+
+
+    public List<List<Integer>> generateNeighborhood(List<List<Integer>> solution,Integer numPaths ){
         //Generates a neighborhood for a random
-        int[][] overlapGraph = initializeOverlapGraph(solutions);
+        int[][] overlapGraph = initializeOverlapGraph( solution);
+
 
         //Picks random route in solution list to work on
-        int ranSolutionIndex = new Random().nextInt(solutions.size());
-        List<Integer> shortestPath = solutions.get(ranSolutionIndex);
-
+        int ranSolutionIndex = new Random().nextInt(solution.size());
+        List<Integer> shortestPath = solution.get(ranSolutionIndex);
+        System.out.println(ranSolutionIndex);
 
         Node src = a.getNodes().get(shortestPath.get(0));
         Node dest = a.getNodes().get(shortestPath.get(shortestPath.size()-1));
@@ -66,12 +71,13 @@ public abstract class MetaHeuristic {
 
         //Choose a random path in the generated shortestPaths
         int ranIndex = new Random().nextInt(numPaths);
-        List<Integer> newSolution = shortestPaths.get(ranIndex);
+        List<Integer> newRoute = shortestPaths.get(ranIndex);
+
 
         //Replace the random route with the new solution
-        solutions.set(ranSolutionIndex,newSolution);
+        solution.set(ranSolutionIndex,newRoute);
 
-        return shortestPaths;
+        return solution;
     }
 
     public ArrayList<Integer> BFS(Node src, Node dest, int[][] graph) {
@@ -118,6 +124,7 @@ public abstract class MetaHeuristic {
     }
 
     public void printGraph( int[][] graph){
+
         System.out.println("NEW GRAPH");
         for (int row = 0; row < graph.length; row++){
 
@@ -129,6 +136,7 @@ public abstract class MetaHeuristic {
 
         }
     }
+
 
 
 
