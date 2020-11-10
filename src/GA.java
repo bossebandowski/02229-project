@@ -3,6 +3,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+/*enum ReplacementType
+{
+
+}*/
+
 public class GA {
     ArrayList<Stream> _streams;
     int _init_population_size;
@@ -120,13 +125,40 @@ public class GA {
         return result;
     }
 
-
-    public List<List<Integer>> generateGeneration()
+    public void runGA()
     {
-        List<List<Integer>> newGeneration = new ArrayList<>();
+        for(int i = 0; i < _number_of_generations; i++)
+        {
+            calculateFitness();
+            for(Stream currentStream:_streams)
+            {
+                HashMap<Stream,List<List<Integer>>> newGeneration = generateGeneration();
+                if(_population_size == _number_of_children)
+                {
+                    _population.clear();
+                    _population = newGeneration;
+                }
+                else
+                {
+                    for(int k = 0; k < (_population_size - _number_of_children); k++)
+                    {
+                        int rand1 = rand.nextInt(_population.get(currentStream).size());
+                        _population.get(currentStream).remove(rand1);
+                    }
+                    _population.get(currentStream).addAll(newGeneration.get(currentStream));
+                }
+            }
+        }
+    }
+
+
+    public HashMap<Stream,List<List<Integer>>> generateGeneration()
+    {
+        HashMap<Stream,List<List<Integer>>> newGeneration = new HashMap<>();
         HashMap<Stream,List<List<Integer>>> parents = selectParents(_number_of_children);
         for(Stream currentStream: _streams)
         {
+            newGeneration.put(currentStream,null);
             List<List<Integer>> currentParents = parents.get(currentStream);
             int parentPointer = 0;
             for(int i = 0; i < _number_of_children; i++)
@@ -137,20 +169,24 @@ public class GA {
                 {
                     rand2 = 1;
                 }
-                changeRandomSegment(currentParents.get(parentPointer+rand1),currentParents.get(parentPointer+rand2));
+                newGeneration.get(currentStream).add(changeRandomSegment(currentParents.get(parentPointer+rand1),currentParents.get(parentPointer+rand2)));
                 parentPointer += 2;
             }
         }
         return newGeneration;
     }
 
-    public List<List<Integer>> changeRandomSegment(List<Integer> parent1, List<Integer> parent2)
+    public List<Integer> changeRandomSegment(List<Integer> parent1, List<Integer> parent2)
     {
-        List<List<Integer>> mergedRoute = new ArrayList<>();
+        List<Integer> mergedRoute = new ArrayList<>();
         boolean foundCommonNode = false;
+        int nodeToChangeIndex1 = -1;
+        int nodeToChangeIndex2 = -1;
+        int returnIndex1 = -1;
+        int returnIndex2 = -1;
         while(!foundCommonNode) {
-            int nodeToChangeIndex1 = rand.nextInt(parent1.size() - 2) + 1;
-            int nodeToChangeIndex2 = 0;
+            nodeToChangeIndex1 = rand.nextInt(parent1.size() - 2) + 1;
+            nodeToChangeIndex2 = -1;
             int nodeToChange = parent1.get(nodeToChangeIndex1);
             for (int i = 0; i < parent2.size(); i++) {
                 if (parent2.get(i) == nodeToChange) {
@@ -158,26 +194,35 @@ public class GA {
                     foundCommonNode = true;
                 }
             }
-        }
-            // found another common node
-            /*int returnIndex1 = 0;
-            int returnIndex2 = 0;
-            for(int i = nodeToChangeIndex1 + 1; i < parent1.size(); i++)
+            // Find return node (worst case this is the destination node)
+            for(int i = nodeToChangeIndex1 + 1;i < parent1.size();i++)
             {
-                int currentNodeIndex1 = parent1.get(i);
-                for(int k = nodeToChangeIndex2; k < parent2.size(); k++)
+                for(int k = nodeToChangeIndex2 + 1; k < parent2.size(); k++)
                 {
-                    if(currentNodeIndex1 == parent2.get(k))
+                    if(parent1.get(i) == parent2.get(k))
                     {
-                        // In worst case this is the destination node
                         returnIndex1 = i;
                         returnIndex2 = k;
                     }
                 }
             }
-            for(int i = nodeToChangeIndex1)*/
+
+        }
+        // Copy the remaining nodes from parent1 to result
+        for(int i = 0; i < nodeToChangeIndex1; i++)
+        {
+            mergedRoute.add(parent1.get(i));
+        }
+        // Copy the nodes from the parent2
+        for(int i = nodeToChangeIndex2; i < returnIndex2;i++)
+        {
+            mergedRoute.add(parent2.get(i));
+        }
+        // Copy last elements of parent1
+        for(int i = returnIndex1; i < parent1.size();i++)
+        {
+            mergedRoute.add(parent1.get(i));
+        }
         return  mergedRoute;
     }
-
-
 }
