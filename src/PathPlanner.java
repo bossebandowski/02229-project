@@ -28,14 +28,22 @@ public class PathPlanner {
 
         // built initial solution
 //        SolutionBuilder sb = new BfsSolutionBuilder(architecture);
-        SolutionBuilder sb = new AStarSolutionBuilder(architecture);
+        SolutionBuilder sb = new BfsSolutionBuilder(architecture);
         List<List<Integer>> initSol = sb.builtSolution();
         System.out.println(initSol);
         // run optimization
-
+        MetaHeuristic mh = new TestMH(architecture);
         // verify solution
+        System.out.print("Checking viability...");
+        if (mh.isViable(initSol)) {
+            System.out.println("ok");
+        } else {
+            System.out.println("ERR");
+        }
 
         // write output to file
+        System.out.println("Writing solution to " + pathOut);
+        ioHandler.writeSolution(initSol, pathOut, "testName");
     }
 
     public static void main(String[] args) {
