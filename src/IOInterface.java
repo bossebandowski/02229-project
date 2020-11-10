@@ -1,10 +1,18 @@
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.util.List;
 
 public class IOInterface {
     private Architecture architecture = new Architecture();
@@ -97,6 +105,61 @@ public class IOInterface {
             e.printStackTrace();
             System.exit(-1);
             return null;
+        }
+    }
+
+    public void writeSolution(List<List<Integer>> solution, String path, String name) {
+
+        try {
+            DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+            Document document = documentBuilder.newDocument();
+
+            // root element
+            Element root = document.createElement("solution");
+            document.appendChild(root);
+            root.setAttribute("tc_name", name);
+
+            // add task elements
+            int idx = 0;
+            for (Stream s : architecture.getStreams()) {
+                Element sElement = document.createElement("stream");
+                root.appendChild(sElement);
+
+                sElement.setAttribute("id", String.valueOf(s.getName()));
+                for (int rep = 0; rep < s.getRl(); rep++) {
+                    List<Integer> route = solution.get(idx);
+                    Element rElement = document.createElement("route");
+                    sElement.appendChild(rElement);
+
+                    int parent = route.get(0);
+                    int child;
+                    for (int rId = 1; rId < route.size(); rId++) {
+                        child = route.get(rId);
+                        Link l = architecture.getLinks().get(architecture.getGraph()[parent][child]);
+                        Element lElement = document.createElement("link");
+                        rElement.appendChild(lElement);
+                        lElement.setAttribute("src", l.getStart().getName());
+                        lElement.setAttribute("dest", l.getEnd().getName());
+
+                        parent = child;
+                    }
+
+                    idx++;
+                }
+            }
+
+            // create the xml file
+            // transform the DOM Object to an XML File
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource domSource = new DOMSource(document);
+            StreamResult streamResult = new StreamResult(new File(path));
+
+            transformer.transform(domSource, streamResult);
+
+        } catch (ParserConfigurationException | TransformerException pce) {
+            pce.printStackTrace();
         }
     }
 }

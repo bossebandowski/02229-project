@@ -36,6 +36,8 @@ public class PathPlanner {
         // verify solution
 
         // write output to file
+        System.out.println("Writing solution to " + pathOut);
+        ioHandler.writeSolution(initSol, pathOut, "testName");
     }
 
     public static void main(String[] args) {
