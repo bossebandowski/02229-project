@@ -63,7 +63,7 @@ public class BfsSolutionBuilder extends SolutionBuilder {
                 initSolution.add(this.builtSingleRoute(s));
             }
         }
-
+        /*
         int count = 0;
         for (List<Integer> route : initSolution) {
 
@@ -74,7 +74,7 @@ public class BfsSolutionBuilder extends SolutionBuilder {
             System.out.println("|");
             count++;
         }
-
+        */
         return initSolution;
     }
 }

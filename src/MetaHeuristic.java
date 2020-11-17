@@ -48,7 +48,7 @@ public abstract class MetaHeuristic {
         //Picks random route in solution list to work on
         int ranSolutionIndex = new Random().nextInt(solution.size());
         List<Integer> shortestPath = solution.get(ranSolutionIndex);
-        System.out.println(ranSolutionIndex);
+        // System.out.println(ranSolutionIndex);
 
         Node src = a.getNodes().get(shortestPath.get(0));
         Node dest = a.getNodes().get(shortestPath.get(shortestPath.size()-1));
@@ -89,8 +89,6 @@ public abstract class MetaHeuristic {
         float delayCost = calculateDelayCost(solution);
 
         result = delayCoeff * delayCost + overlapCoeff * overlapCost + routeLengthCoeff * routeLengthCost + bandwidthCoeff * bandwidthCost;
-        System.out.printf("Total cost:\t %.2f\n", result);
-
         return result;
     }
 

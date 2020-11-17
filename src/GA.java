@@ -24,13 +24,12 @@ public class GA extends MetaHeuristic {
     private RandomSolutionBuilder sb;
 
     public GA(Architecture architecture, int init_population_size, int _population_size,
-              int _number_of_generations, int _number_of_children) {
+              int _number_of_children) {
         super(architecture);
         this._streams = architecture.getStreams();
         //this._architecture = architecture;
         this._init_population_size = init_population_size;
         this._population_size = _population_size;
-        this._number_of_generations = _number_of_generations;
         this._number_of_children = _number_of_children;
         this.sb = new RandomSolutionBuilder(architecture);
     }
