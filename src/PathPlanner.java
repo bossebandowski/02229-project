@@ -27,12 +27,17 @@ public class PathPlanner {
         architecture.buildGraph();
 
         // built initial solution
-//        SolutionBuilder sb = new BfsSolutionBuilder(architecture);
         SolutionBuilder sb = new BfsSolutionBuilder(architecture);
+        // SolutionBuilder sb = new AStarSolutionBuilder(architecture);
+        // SolutionBuilder sb = new RandomSolutionBuilder(architecture);
         List<List<Integer>> initSol = sb.builtSolution();
         System.out.println(initSol);
+
         // run optimization
         MetaHeuristic mh = new TestMH(architecture);
+        mh.run(10);
+        mh.calculateCostFunction(initSol);
+
         // verify solution
         System.out.print("Checking viability...");
         if (mh.isViable(initSol)) {
