@@ -1,3 +1,5 @@
+import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.Random;
 
 public class GA {
     ArrayList<Stream> _streams;
+    Architecture _architecture;
     int _init_population_size;
     int _population_size;
     int _number_of_generations;
@@ -18,10 +21,11 @@ public class GA {
     HashMap<Stream,List<Float>> _fitness; // Fitness level of each member of population
     Random rand = new Random();
 
-    public GA(ArrayList<Stream> streams, int init_population_size, int _population_size,
+    public GA(ArrayList<Stream> streams, Architecture architecture, int init_population_size, int _population_size,
               int _number_of_generations, int _number_of_children)
     {
         this._streams = streams;
+        this._architecture = architecture;
         this._init_population_size = init_population_size;
         this._population_size = _population_size;
         this._number_of_generations = _number_of_generations;
@@ -35,11 +39,62 @@ public class GA {
             List<List<Integer>> generated_population = new ArrayList<>();
             for(int i = 0; i < _init_population_size; i++)
             {
-                //generated_population.add(...);
-                //TODO: generate random routes between the start and end nodes
+                generated_population.add(generateRandomRoute(currentStream));
             }
             _population.put(currentStream,generated_population);
         }
+    }
+
+    public List<Integer> generateRandomRoute(Stream stream)
+    {
+        List<Integer> result = null;
+        result.add(stream.getSource().getId());
+        Node currentNode = stream.getSource();
+        boolean invalid = false;
+        while(currentNode != stream.getDestination())
+        {
+            if(invalid)
+            {
+                invalid = false;
+                currentNode = stream.getSource();
+                result.clear();
+                result.add(currentNode.getId());
+            }
+            Link randomLink = getRandomLink(currentNode, null);
+            if(randomLink == null)
+            {
+                invalid = true;
+                continue;
+            }
+            currentNode = randomLink.getOtherEnd(currentNode);
+            result.add(currentNode.getId());
+        }
+        return result;
+    }
+
+    public Link getRandomLink(Node node, Link previousLink)
+    {
+        ArrayList<Link> connectingLinks = _architecture.getConnectingLinks(node);
+        int maxTry = connectingLinks.size();
+        int probes = 0;
+        int randomLinkID;
+        while(probes <= maxTry)
+        {
+            randomLinkID = rand.nextInt(connectingLinks.size());
+            if(connectingLinks.get(randomLinkID) != previousLink)
+            {
+                return connectingLinks.get(randomLinkID);
+            }
+            probes++;
+        }
+        for(Link currentLink:connectingLinks)
+        {
+            if(currentLink != previousLink)
+            {
+                return currentLink;
+            }
+        }
+        return null;
     }
 
     public void calculateFitness()

@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Link {
     private static int count = 0;
     private final Node start;
@@ -23,6 +25,20 @@ public class Link {
 
     public Node getEnd() {
         return end;
+    }
+
+    public Node getOtherEnd(Node node)
+    {
+        if(start == node)
+        {
+            return  end;
+        }
+        else if(end == node)
+        {
+            return start;
+        }
+        System.out.println("The node is not connected to the Link");
+        return null;
     }
 
     public float getSpeed() {

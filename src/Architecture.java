@@ -101,4 +101,17 @@ public class Architecture {
         System.err.println("There is no link in the architecture, which meets your requirement!");
         return null;
     }
+
+    public ArrayList<Link> getConnectingLinks(Node node)
+    {
+        ArrayList<Link> result = new ArrayList<>();
+        for(Link currentLink:links)
+        {
+            if(currentLink.getStart() == node || currentLink.getEnd() == node)
+            {
+                result.add(currentLink);
+            }
+        }
+        return result;
+    }
 }
