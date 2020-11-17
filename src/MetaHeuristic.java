@@ -8,7 +8,7 @@ import java.util.*;
 public abstract class MetaHeuristic {
 
     protected Architecture a;
-    private List<List<Integer>> bestSolution;
+    protected List<List<Integer>> bestSolution;
 
     public MetaHeuristic(Architecture a) {
         this.a = a;
@@ -39,9 +39,6 @@ public abstract class MetaHeuristic {
 
         return graph;
     }
-
-
-
 
     public List<List<Integer>> generateNeighborhood(List<List<Integer>> solution,Integer numPaths ){
         //Generates a neighborhood for a random
@@ -79,10 +76,10 @@ public abstract class MetaHeuristic {
     }
 
     public float calculateCostFunction(List<List<Integer>> solution) {
-        float result = 0.0f;
+        float result;
 
         final float bandwidthCoeff = 1f;
-        final float overlapCoeff = 1f;
+        final float overlapCoeff = 1000f;
         final float routeLengthCoeff = 1f;
         final float delayCoeff = 1f;
 
@@ -91,14 +88,10 @@ public abstract class MetaHeuristic {
         float routeLengthCost = calculateRouteLengthCost(solution);
         float delayCost = calculateDelayCost(solution);
 
-        System.out.printf("Bandwidth cost:\t %.2f\n", bandwidthCost);
-        System.out.printf("Overlap cost:\t %.2f\n", overlapCost);
-        System.out.printf("Length cost:\t %.2f\n", routeLengthCost);
-        System.out.printf("Delay cost:\t %.2f\n", delayCost);
-        System.out.println("---------------------------");
-        System.out.printf("Total cost:\t %.2f\n", delayCost + overlapCost + routeLengthCost + bandwidthCost);
+        result = delayCoeff * delayCost + overlapCoeff * overlapCost + routeLengthCoeff * routeLengthCost + bandwidthCoeff * bandwidthCost;
+        System.out.printf("Total cost:\t %.2f\n", result);
 
-        return  result;
+        return result;
     }
 
     public boolean isViable(List<List<Integer>> solution) {
@@ -224,6 +217,17 @@ public abstract class MetaHeuristic {
 
 
         }
+    }
+
+    public List<List<Integer>> createSolutionCopy(List<List<Integer>> solution) {
+        List<List<Integer>> out = new ArrayList<>();
+
+        for (List<Integer> route : solution) {
+            List<Integer> routeCopy = new ArrayList<Integer>(route);
+            out.add(routeCopy);
+        }
+
+        return out;
     }
 
     public List<List<Integer>> getSolution() {

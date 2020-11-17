@@ -34,13 +34,20 @@ public class PathPlanner {
         System.out.println(initSol);
 
         // run optimization
-        MetaHeuristic mh = new TestMH(architecture);
+        MetaHeuristic mh = new SA(architecture, 0.99f, 100, initSol);
+        List<List<Integer>> realInitSol = mh.createSolutionCopy(initSol);
         mh.run(10);
-        mh.calculateCostFunction(initSol);
+        List<List<Integer>> best = mh.getSolution();
+
+        System.out.println("init cost:");
+        mh.calculateCostFunction(realInitSol);
+        System.out.println("==============");
+        System.out.println("best cost:");
+        mh.calculateCostFunction(best);
 
         // verify solution
         System.out.print("Checking viability...");
-        if (mh.isViable(initSol)) {
+        if (mh.isViable(best)) {
             System.out.println("ok");
         } else {
             System.out.println("ERR");
