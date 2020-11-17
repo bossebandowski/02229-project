@@ -5,9 +5,6 @@ import java.util.List;
 
 import java.util.*;
 
-import java.util.Arrays;
-import java.util.List;
-
 public abstract class MetaHeuristic {
 
     private Architecture a;
@@ -138,8 +135,6 @@ public abstract class MetaHeuristic {
     }
 
 
-
-
     float calculateCostFunction(List<List<Integer>> solution) {
         float result = 0.0f;
 
@@ -221,7 +216,7 @@ public abstract class MetaHeuristic {
     }
 
     public boolean isViable(List<List<Integer>> solution) {
-        return this.deadlinesOk(solution);
+        return this.deadlinesOk(solution) && this.bandwidthOk(solution);
     }
 
     private void calculateMaxLinkDelays(List<List<Integer>> solution) {
@@ -277,6 +272,45 @@ public abstract class MetaHeuristic {
 
                 // if t is greater than the stream's deadline, then the check has been failed
                 if (t > deadline) return false;
+                // check next route
+                idx++;
+            }
+        }
+        return true;
+    }
+
+    private boolean bandwidthOk(List<List<Integer>> solution) {
+        ArrayList<Float> availableBandwidth = new ArrayList<>();
+        ArrayList<Float> usedBandwidth = new ArrayList<>();
+
+        for (Link l : this.a.getLinks()) {
+            availableBandwidth.add(l.getSpeed());
+            usedBandwidth.add(0f);
+        }
+
+        int idx = 0;
+        // iterate over all streams
+        for (Stream s : this.a.getStreams()) {
+            // get stream period
+            float period = s.getPeriod();
+            float size = s.getSize();
+            float bwReq = size/period;
+
+            // iterate over all routes associated with the stream
+            for (int rep = 0; rep < s.getRl(); rep++) {
+                List<Integer> route = solution.get(idx);
+                int parent = route.get(0);
+                int child;
+                // get all links. add bw required to all links along the route
+                for (int rId = 1; rId < route.size(); rId++) {
+                    child = route.get(rId);
+                    Link l = this.a.getLinks().get(this.a.getGraph()[parent][child]);
+                    usedBandwidth.set(l.getId(), usedBandwidth.get(l.getId()) + bwReq);
+                    if (usedBandwidth.get(l.getId()) > availableBandwidth.get(l.getId())) {
+                        return false;
+                    }
+                    parent = child;
+                }
                 // check next route
                 idx++;
             }

@@ -57,4 +57,8 @@ public class Stream {
     public int getRl() {
         return rl;
     }
+
+    public float getBandwith() {
+        return (float) this.size/this.period;
+    }
 }
