@@ -24,9 +24,9 @@ public class PathPlanner {
         System.err.println("\ttest");
         System.err.println("\tsa");
         System.err.println("\tga");
-        System.err.println("\tExample (from terminal while being in src folder):");
-        System.err.println("\t\t>>>javac *.java");
-        System.err.println("\t\t>>>java PathPlanner -in ../data/TC0_example.app_network_description -out out.xml");
+        System.err.println("Example (from terminal while being in src folder):");
+        System.err.println("\t>>>javac *.java");
+        System.err.println("\t>>>java PathPlanner -mh sa -sb bfs -rt 5");
     }
 
     private static void parseArgs(String[] args) {
