@@ -12,7 +12,6 @@ public class BfsSolutionBuilder extends SolutionBuilder {
         Node dest = s.getDestination();
         int numNodes = a.getGraph().length;
         ArrayList<Integer> route = new ArrayList<>();
-        route = new ArrayList<>();
         // keep track of shortest path between src node and other nodes
         int[] shortestPathLen = new int[numNodes];
         Arrays.fill(shortestPathLen, Integer.MAX_VALUE);

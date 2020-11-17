@@ -4,4 +4,9 @@ public class TestMH extends MetaHeuristic{
         super(a);
     }
 
+    @Override
+    public void run(int runtimeSeconds) {
+
+    }
+
 }

@@ -7,14 +7,16 @@ import java.util.*;
 
 public abstract class MetaHeuristic {
 
-    private Architecture a;
-
+    protected Architecture a;
+    private List<List<Integer>> bestSolution;
 
     public MetaHeuristic(Architecture a) {
         this.a = a;
     }
 
-    public int[][] initializeOverlapGraph(List<List<Integer>> solution) {
+    public abstract void run(int runtimeSeconds);
+
+    public int[][] initializeOverlapGraph(List<List<Integer>> solutions) {
         //Select route in current solution
 
         int[][] graph = new int[a.getGraph().length][a.getGraph()[0].length];
@@ -29,7 +31,7 @@ public abstract class MetaHeuristic {
             }
         }
 
-        for (List<Integer> route : solution){
+        for (List<Integer> route : solutions){
             for (int node = 0; node < route.size()-1;node++){
                 graph[route.get(node)][route.get(node+1)] +=1;
             }
@@ -37,7 +39,6 @@ public abstract class MetaHeuristic {
 
         return graph;
     }
-    
 
 
 
@@ -75,6 +76,97 @@ public abstract class MetaHeuristic {
         solution.set(ranSolutionIndex,newRoute);
 
         return solution;
+    }
+
+    public float calculateCostFunction(List<List<Integer>> solution) {
+        float result = 0.0f;
+
+        final float bandwidthCoeff = 1f;
+        final float overlapCoeff = 1f;
+        final float routeLengthCoeff = 1f;
+        final float delayCoeff = 1f;
+
+        float bandwidthCost = calculateBandwidthCost(solution);
+        float overlapCost = calculateOverlapCost(solution);
+        float routeLengthCost = calculateRouteLengthCost(solution);
+        float delayCost = calculateDelayCost(solution);
+
+        System.out.printf("Bandwidth cost:\t %.2f\n", bandwidthCost);
+        System.out.printf("Overlap cost:\t %.2f\n", overlapCost);
+        System.out.printf("Length cost:\t %.2f\n", routeLengthCost);
+        System.out.printf("Delay cost:\t %.2f\n", delayCost);
+        System.out.println("---------------------------");
+        System.out.printf("Total cost:\t %.2f\n", delayCost + overlapCost + routeLengthCost + bandwidthCost);
+
+        return  result;
+    }
+
+    public boolean isViable(List<List<Integer>> solution) {
+        return this.deadlinesOk(solution) && this.bandwidthOk(solution);
+    }
+
+    // auxiliary functions
+    private void calculateMaxLinkDelays(List<List<Integer>> solution) {
+        float[] dataTransferred = new float[this.a.getLinks().size()];
+        Arrays.fill(dataTransferred, 0f);
+        int idx = 0;
+
+        for (Stream s : this.a.getStreams()) {
+            int size = s.getSize();
+            for (int rep = 0; rep < s.getRl(); rep++) {
+                List<Integer> route = solution.get(idx);
+
+                int parent = route.get(0);
+                int child;
+                // get all links. calculate time it takes to pass the link and add to t
+                for (int rId = 1; rId < route.size(); rId++) {
+                    child = route.get(rId);
+                    int linkId = this.a.getGraph()[parent][child];
+                    dataTransferred[linkId] += size;
+                    parent = child;
+                }
+                idx++;
+            }
+        }
+
+        for (int i = 0; i < dataTransferred.length; i++) {
+            Link l = this.a.getLinks().get(i);
+            l.setC(dataTransferred[i]/l.getSpeed());
+        }
+    }
+
+    private ArrayList<Float> calculateUsedBandwidth(List<List<Integer>> solution) {
+        ArrayList<Float> usedBandwidth = new ArrayList<>();
+
+        for (Link l : this.a.getLinks()) {
+            usedBandwidth.add(0f);
+        }
+
+        int idx = 0;
+        // iterate over all streams
+        for (Stream s : this.a.getStreams()) {
+            // get stream period
+            float period = s.getPeriod();
+            float size = s.getSize();
+            float bwReq = size/period;
+
+            // iterate over all routes associated with the stream
+            for (int rep = 0; rep < s.getRl(); rep++) {
+                List<Integer> route = solution.get(idx);
+                int parent = route.get(0);
+                int child;
+                // get all links. add bw required to all links along the route
+                for (int rId = 1; rId < route.size(); rId++) {
+                    child = route.get(rId);
+                    Link l = this.a.getLinks().get(this.a.getGraph()[parent][child]);
+                    usedBandwidth.set(l.getId(), usedBandwidth.get(l.getId()) + bwReq);
+                    parent = child;
+                }
+                // check next route
+                idx++;
+            }
+        }
+        return usedBandwidth;
     }
 
     public ArrayList<Integer> BFS(Node src, Node dest, int[][] graph) {
@@ -134,120 +226,11 @@ public abstract class MetaHeuristic {
         }
     }
 
-
-    float calculateCostFunction(List<List<Integer>> solution) {
-        float result = 0.0f;
-
-        final float bandwidthCoeff = 0.0f;
-        final float rlCoeff = 0.0f;
-        final float totalLengthCoeff = 0.0f;
-        final float deadlineCoeff = 0.0f;
-        final float overlappingCoeff = 0.0f;
-
-        // Calculate free bandwidth of each link
-        ArrayList<Link> linkBuffer = this.a.getLinks();
-        HashMap<Link,Float> linkCapacity = new HashMap<Link,Float>();
-        for(Link link:linkBuffer)
-        {
-            linkCapacity.put(link, link.getSpeed());
-        }
-        for (Integer streamID = 0; streamID < solution.size(); streamID++)
-        {
-            for(Integer nodeID = 0; nodeID < solution.get(streamID).size(); nodeID++)
-            {
-                if(nodeID > 0)
-                {
-                    Link currentLink = this.a.getLink(solution.get(streamID).get(nodeID - 1),solution.get(streamID).get(nodeID));
-                    linkCapacity.put(currentLink, linkCapacity.get(currentLink) - (this.a.getStreambyID(streamID).getSize()
-                            / this.a.getStreambyID(streamID).getPeriod()));
-                }
-            }
-        }
-        for(Link link:linkCapacity.keySet())
-        {
-            result += linkCapacity.get(link) * bandwidthCoeff;
-        }
-
-
-
-        // Calculate overlapping (number of common links of Streams with common start and end Node)
-        HashMap<Integer,Integer> streamOverlaps = new HashMap<Integer,Integer>();
-        for(Stream currentStream:this.a.getStreams())
-        {
-            streamOverlaps.put(currentStream.getId(),0);
-        }
-        ArrayList<Stream> streams = this.a.getStreams();
-        int k = 0;
-        for(int i = 0; i < streams.size(); i++)
-        {
-            Stream currentStream = streams.get(i);
-            ArrayList<Integer> usedLinks = new ArrayList<Integer>();
-            int currentRl = currentStream.getRl();
-            int currentStreamStart = k;
-            for(; k < currentStreamStart + currentRl; k++)
-            {
-                for(int j = 0; j < solution.get(k).size(); j++)
-                {
-                    if(!usedLinks.contains(solution.get(k).get(j)))
-                    {
-                        usedLinks.add(solution.get(k).get(j));
-                    }
-                    else
-                    {
-                        streamOverlaps.put(i,streamOverlaps.get(i) + 1);
-                    }
-                }
-            }
-            result -= overlappingCoeff * streamOverlaps.get(i);
-        }
-
-        // Calculate total length of routes
-        ArrayList<Integer> lengths = new ArrayList<Integer>();
-        for (Integer streamID = 0; streamID < solution.size(); streamID++)
-        {
-            lengths.add(solution.get(streamID).size());
-            // Todo: How is the length affects the cost function
-        }
-
-
-
-
-        return  result;
+    public List<List<Integer>> getSolution() {
+        return this.bestSolution;
     }
 
-    public boolean isViable(List<List<Integer>> solution) {
-        return this.deadlinesOk(solution) && this.bandwidthOk(solution);
-    }
-
-    private void calculateMaxLinkDelays(List<List<Integer>> solution) {
-        float[] dataTransferred = new float[this.a.getLinks().size()];
-        Arrays.fill(dataTransferred, 0f);
-        int idx = 0;
-
-        for (Stream s : this.a.getStreams()) {
-            int size = s.getSize();
-            for (int rep = 0; rep < s.getRl(); rep++) {
-                List<Integer> route = solution.get(idx);
-
-                int parent = route.get(0);
-                int child;
-                // get all links. calculate time it takes to pass the link and add to t
-                for (int rId = 1; rId < route.size(); rId++) {
-                    child = route.get(rId);
-                    int linkId = this.a.getGraph()[parent][child];
-                    dataTransferred[linkId] += size;
-                    parent = child;
-                }
-                idx++;
-            }
-        }
-
-        for (int i = 0; i < dataTransferred.length; i++) {
-            Link l = this.a.getLinks().get(i);
-            l.setC(dataTransferred[i]/l.getSpeed());
-        }
-    }
-
+    // partial viability evaluations
     private boolean deadlinesOk(List<List<Integer>> solution) {
         this.calculateMaxLinkDelays(solution);
 
@@ -280,41 +263,91 @@ public abstract class MetaHeuristic {
     }
 
     private boolean bandwidthOk(List<List<Integer>> solution) {
-        ArrayList<Float> availableBandwidth = new ArrayList<>();
-        ArrayList<Float> usedBandwidth = new ArrayList<>();
+        ArrayList<Float> usedBandwidth = calculateUsedBandwidth(solution);
 
         for (Link l : this.a.getLinks()) {
-            availableBandwidth.add(l.getSpeed());
-            usedBandwidth.add(0f);
+            if (l.getSpeed() < usedBandwidth.get(l.getId())) return false;
         }
 
-        int idx = 0;
-        // iterate over all streams
-        for (Stream s : this.a.getStreams()) {
-            // get stream period
-            float period = s.getPeriod();
-            float size = s.getSize();
-            float bwReq = size/period;
+        return true;
+    }
 
-            // iterate over all routes associated with the stream
+    // partial cost functions
+    private float calculateBandwidthCost(List<List<Integer>> solution) {
+        ArrayList<Float> usedBandwidth = calculateUsedBandwidth(solution);
+        float cost = 0f;
+
+        for (Link l : this.a.getLinks()) {
+            cost += 1 - (usedBandwidth.get(l.getId())/l.getSpeed());
+        }
+
+        return cost;
+    }
+
+    private float calculateOverlapCost(List<List<Integer>> solution) {
+        float cost = 0;
+        int idx = 0;
+
+        // go stream by stream
+        for (Stream s : this.a.getStreams()) {
+            // instantiate aux vars
+            int overlaps = 0;
+            int shortestRouteLength = Integer.MAX_VALUE;
+            ArrayList<Integer> linksVisited = new ArrayList<>();
+
+            // for every stream, check all routes according to redundancy level
             for (int rep = 0; rep < s.getRl(); rep++) {
                 List<Integer> route = solution.get(idx);
+
+                // preserve shortest route length
+                if (route.size() < shortestRouteLength) shortestRouteLength = route.size();
+
+                // calculate number of shared links
+                // iterate over links in route
                 int parent = route.get(0);
                 int child;
-                // get all links. add bw required to all links along the route
+
                 for (int rId = 1; rId < route.size(); rId++) {
                     child = route.get(rId);
                     Link l = this.a.getLinks().get(this.a.getGraph()[parent][child]);
-                    usedBandwidth.set(l.getId(), usedBandwidth.get(l.getId()) + bwReq);
-                    if (usedBandwidth.get(l.getId()) > availableBandwidth.get(l.getId())) {
-                        return false;
+
+                    // if the link has already been visited, increment overlap count.
+                    // if not, mark as visited
+
+                    if (linksVisited.contains(l.getId())) {
+                        overlaps++;
+                    } else {
+                        linksVisited.add(l.getId());
                     }
+
                     parent = child;
                 }
+
                 // check next route
                 idx++;
             }
+
+            // divide number of shared links by shortest route length of stream
+            cost += (float) overlaps / shortestRouteLength;
+
         }
-        return true;
+
+        return cost;
     }
+
+    private float calculateRouteLengthCost(List<List<Integer>> solution) {
+        int totalLength = 0;
+
+        // Calculate total length of all routes in solution
+        for (List<Integer> route : solution) {
+            totalLength += route.size();
+        }
+
+        return totalLength;
+    }
+
+    private float calculateDelayCost(List<List<Integer>> solution) {
+        return 0f;
+    }
+
 }
