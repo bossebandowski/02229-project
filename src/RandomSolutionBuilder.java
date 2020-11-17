@@ -21,7 +21,7 @@ public class RandomSolutionBuilder extends SolutionBuilder {
                 route.clear();
                 route.add(currentNode.getId());
             }
-            Link randomLink = getRandomLink(currentNode, null);
+            Link randomLink = getRandomLink(currentNode, route);
             if (randomLink == null) {
                 invalid = true;
                 continue;
@@ -32,24 +32,36 @@ public class RandomSolutionBuilder extends SolutionBuilder {
         return route;
     }
 
-    public Link getRandomLink(Node node, Link previousLink) {
+    public Link getRandomLink(Node node, List<Integer> route) {
         ArrayList<Link> connectingLinks = this.a.getConnectingLinks(node);
         int maxTry = connectingLinks.size();
         int probes = 0;
         int randomLinkID;
         while (probes <= maxTry) {
             randomLinkID = rand.nextInt(connectingLinks.size());
-            if (connectingLinks.get(randomLinkID) != previousLink) {
+            if (!contains(route, connectingLinks.get(randomLinkID).getOtherEnd(node))) {
                 return connectingLinks.get(randomLinkID);
             }
             probes++;
         }
         for (Link currentLink : connectingLinks) {
-            if (currentLink != previousLink) {
+            if (!contains(route, currentLink.getOtherEnd(node))) {
                 return currentLink;
             }
         }
         return null;
+    }
+
+    public boolean contains(List<Integer> route, Node node)
+    {
+        for(Integer currentInteger:route)
+        {
+            if(node.getId() == currentInteger)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
