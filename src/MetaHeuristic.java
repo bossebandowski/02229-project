@@ -44,7 +44,6 @@ public abstract class MetaHeuristic {
         //Generates a neighborhood for a random
         int[][] overlapGraph = initializeOverlapGraph( solution);
 
-
         //Picks random route in solution list to work on
         int ranSolutionIndex = new Random().nextInt(solution.size());
         List<Integer> shortestPath = solution.get(ranSolutionIndex);
@@ -349,7 +348,37 @@ public abstract class MetaHeuristic {
     }
 
     private float calculateDelayCost(List<List<Integer>> solution) {
-        return 0f;
-    }
+        this.calculateMaxLinkDelays(solution);
+        float cost = 0f;
 
+        int idx = 0;
+        // iterate over all streams
+        for (Stream s : this.a.getStreams()) {
+            // get stream deadline
+            float deadline = (float) s.getDeadline();
+            // iterate over all routes associated with the stream
+            for (int rep = 0; rep < s.getRl(); rep++) {
+                float t = 0f;
+                List<Integer> route = solution.get(idx);
+                int parent = route.get(0);
+                int child;
+                // get all links. calculate time it takes to pass the link and add to t
+                for (int rId = 1; rId < route.size(); rId++) {
+                    child = route.get(rId);
+                    Link l = this.a.getLinks().get(this.a.getGraph()[parent][child]);
+                    t += l.getC();
+                    parent = child;
+                }
+
+                // add to cost
+                cost += t/deadline;
+
+                // check next route
+                idx++;
+            }
+        }
+
+        return cost;
+
+    }
 }
