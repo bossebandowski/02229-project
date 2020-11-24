@@ -102,6 +102,18 @@ public class Architecture {
         return null;
     }
 
+    public Link getLinkByID(int linkID)
+    {
+        for(Link currentLink:links)
+        {
+            if(currentLink.getId() == linkID)
+            {
+                return currentLink;
+            }
+        }
+        return null;
+    }
+
     public ArrayList<Link> getConnectingLinks(Node node)
     {
         ArrayList<Link> result = new ArrayList<>();
