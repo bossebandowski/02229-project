@@ -14,14 +14,22 @@ public class RandomSolutionBuilder extends SolutionBuilder {
         route.add(stream.getSource().getId());
         Node currentNode = stream.getSource();
         boolean invalid = false;
-        while (currentNode != stream.getDestination()) {
-            if (invalid) {
+        while (currentNode != stream.getDestination())
+        {
+            if (invalid)
+            {
                 invalid = false;
                 currentNode = stream.getSource();
                 route.clear();
                 route.add(currentNode.getId());
             }
-            Link randomLink = getRandomLink(currentNode, route);
+            int randomLinkID = getRandomLink(currentNode, route);
+            if(randomLinkID == -1)
+            {
+                invalid = true;
+                continue;
+            }
+            Link randomLink = a.getLinkByID(randomLinkID);
             if (randomLink == null) {
                 invalid = true;
                 continue;
@@ -32,24 +40,33 @@ public class RandomSolutionBuilder extends SolutionBuilder {
         return route;
     }
 
-    public Link getRandomLink(Node node, List<Integer> route) {
-        ArrayList<Link> connectingLinks = this.a.getConnectingLinks(node);
-        int maxTry = connectingLinks.size();
+    public int getRandomLink(Node node, List<Integer> route)
+    {
+        List<Integer> startingLinkIDs = new ArrayList<>();
+        for(int i = 0; i < a.getGraph()[0].length;i++)
+        {
+            if(a.getGraph()[node.getId()][i] != -1)
+            {
+                startingLinkIDs.add(a.getGraph()[node.getId()][i]);
+            }
+        }
+        if(startingLinkIDs.size() == 0)
+        {
+            return -1;
+        }
+        int maxTry = startingLinkIDs.size();
         int probes = 0;
         int randomLinkID;
-        while (probes <= maxTry) {
-            randomLinkID = rand.nextInt(connectingLinks.size());
-            if (!contains(route, connectingLinks.get(randomLinkID).getOtherEnd(node))) {
-                return connectingLinks.get(randomLinkID);
+        while(probes <= maxTry)
+        {
+            randomLinkID = rand.nextInt(startingLinkIDs.size());
+            if (!contains(route, a.getLinkByID(startingLinkIDs.get(randomLinkID)).getOtherEnd(node)))
+            {
+                return startingLinkIDs.get(randomLinkID);
             }
             probes++;
         }
-        for (Link currentLink : connectingLinks) {
-            if (!contains(route, currentLink.getOtherEnd(node))) {
-                return currentLink;
-            }
-        }
-        return null;
+        return -1;
     }
 
     public boolean contains(List<Integer> route, Node node)

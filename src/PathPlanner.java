@@ -5,7 +5,7 @@ import java.util.List;
 
 
 public class PathPlanner {
-    static ArrayList<String> parsedArgs = new ArrayList<>(Arrays.asList("../data/TC0_example.app_network_description", "out.xml", "bfs", "sa", "10"));
+    static ArrayList<String> parsedArgs = new ArrayList<>(Arrays.asList("C:/Users/Szabolcs/Documents/REPOS/02229-project/data/TC3_medium.app_network_description", "out.xml", "rnd", "sa", "10"));
     static ArrayList<String> allowedFlags = new ArrayList<String>(Arrays.asList("-in", "-out", "-sb", "-mh", "-rt"));
 
     private static void printHelp() {
@@ -76,7 +76,9 @@ public class PathPlanner {
                 System.out.println("Initialising SA");
 
                 break;
-            case "ga":      mh = new GA(architecture, 10, 10, 20);
+            case "ga":
+                mh = new GA(architecture, 100, 100, 100);
+
                 System.out.println("Initialising GA");
                             break;
             case "test":    mh = new TestMH(architecture);
