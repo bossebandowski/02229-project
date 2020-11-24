@@ -29,6 +29,7 @@ public class SA extends MetaHeuristic {
             float costNext = calculateCostFunction(next);
 
             float delta = costCurrent - costNext;
+
             if (delta > 0 || p(delta, t)) {
                 s_i = next;
                 t = t*alpha;
@@ -39,7 +40,9 @@ public class SA extends MetaHeuristic {
     }
 
     private boolean p(float delta, float t) {
+
         double random = Math.random();
+
         return Math.exp(delta / t) > random;
     }
 }
