@@ -74,8 +74,7 @@ public class PathPlanner {
         switch (mhType) {
             case "sa":      mh = new SA(architecture, 0.99f, 100, initSol);
                 System.out.println("Initialising SA");
-
-                break;
+                            break;
             case "ga":      mh = new GA(architecture, 10, 10, 20);
                 System.out.println("Initialising GA");
                             break;

@@ -79,7 +79,7 @@ public abstract class MetaHeuristic {
         float result;
 
         final float bandwidthCoeff = 1f;
-        final float overlapCoeff = 1000f;
+        final float overlapCoeff = 1f;
         final float routeLengthCoeff = 1f;
         final float delayCoeff = 1f;
 
