@@ -64,11 +64,34 @@ public abstract class MetaHeuristic {
         List<Integer> newRoute = shortestPaths.get(ranIndex);
 
         //Replace the random route with the new solution
-        solution.set(ranSolutionIndex, newRoute);
         newSolution.set(ranSolutionIndex,newRoute);
 
+        return newSolution;
+    }
 
+    // replaces a route segment between two nodes with a random new segment between the same nodes
+    public List<List<Integer>> nn1(List<List<Integer>> solution) {
+        // get random route
+        int routeId = (int) (Math.random()*solution.size());
+        int nodeId1 = (int) (Math.random()*solution.get(routeId).size());
+        int nodeId2 = (int) (Math.random()*solution.get(routeId).size());
 
+        // make sure that the route segment is calculated between two distinct nodes
+        while (solution.get(routeId).get(nodeId1) == solution.get(routeId).get(nodeId2)) {
+            nodeId2 = (int) Math.floor(Math.random()*solution.get(routeId).size());
+        }
+
+        // get new route Segment
+        List<Integer> newRoute;
+
+        if (nodeId1 < nodeId2) {
+            newRoute = replaceRndSegment(nodeId1, nodeId2, solution.get(routeId));
+        } else {
+            newRoute = replaceRndSegment(nodeId2, nodeId1, solution.get(routeId));
+        }
+
+        List<List<Integer>> newSolution = createSolutionCopy(solution);
+        newSolution.set(routeId, newRoute);
         return newSolution;
     }
 
@@ -153,7 +176,6 @@ public abstract class MetaHeuristic {
 
         return newRoute;
     }
-
 
     private void calculateMaxLinkDelays(List<List<Integer>> solution) {
         float[] dataTransferred = new float[this.a.getLinks().size()];
