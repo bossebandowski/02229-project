@@ -44,6 +44,7 @@ public abstract class MetaHeuristic {
         //Generates a neighborhood for a random
         int[][] overlapGraph = initializeOverlapGraph( solution);
 
+        List<List<Integer>> newSolution = createSolutionCopy(solution);
         //Picks random route in solution list to work on
         int ranSolutionIndex = new Random().nextInt(solution.size());
         List<Integer> shortestPath = solution.get(ranSolutionIndex);
@@ -69,14 +70,15 @@ public abstract class MetaHeuristic {
 
 
         //Replace the random route with the new solution
-        solution.set(ranSolutionIndex,newRoute);
+        newSolution.set(ranSolutionIndex,newRoute);
 
-        return solution;
+
+
+        return newSolution;
     }
 
     public float calculateCostFunction(List<List<Integer>> solution) {
         float result;
-
         final float bandwidthCoeff = 1f;
         final float overlapCoeff = 1f;
         final float routeLengthCoeff = 1f;
