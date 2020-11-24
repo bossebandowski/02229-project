@@ -133,7 +133,6 @@ public class GA extends MetaHeuristic
         return generatedChild;
     }
 
-    //TODO finish this function
     private List<Integer> generateChildRoute(List<Integer> parentRoute1,List<Integer> parentRoute2)
     {
         List<Integer> generatedChildRoute = new ArrayList<>();
