@@ -13,9 +13,9 @@ public class GA extends MetaHeuristic
     Random rand = new Random();
 
 
-    public GA(Architecture architecture,int initPopulationSize, int normalPopulationSize, int numberOfChildren)
+    public GA(Architecture architecture, int nn, int initPopulationSize, int normalPopulationSize, int numberOfChildren)
     {
-        super(architecture);
+        super(architecture, nn);
         this._init_population_size = initPopulationSize;
         this._populationSize = normalPopulationSize;
         this._number_of_children = numberOfChildren;

@@ -5,8 +5,8 @@ import java.util.List;
 
 
 public class PathPlanner {
-    static ArrayList<String> parsedArgs = new ArrayList<>(Arrays.asList("../data/TC0_example.app_network_description", "out.xml", "bfs", "sa", "10"));
-    static ArrayList<String> allowedFlags = new ArrayList<String>(Arrays.asList("-in", "-out", "-sb", "-mh", "-rt"));
+    static ArrayList<String> parsedArgs = new ArrayList<>(Arrays.asList("../data/TC0_example.app_network_description", "../out.xml", "bfs", "sa", "10", "-1"));
+    static ArrayList<String> allowedFlags = new ArrayList<String>(Arrays.asList("-in", "-out", "-sb", "-mh", "-rt", "-nn"));
 
     private static void printHelp() {
         System.err.println("You can use the following flags to change the program:");
@@ -43,7 +43,7 @@ public class PathPlanner {
         }
     }
 
-    public static void run(String pIn, String pOut, String sbType, String mhType, int runTime) {
+    public static void run(String pIn, String pOut, String sbType, String mhType, int runTime, int nn) {
 
         // built problem model
         IOInterface ioHandler = new IOInterface();
@@ -53,18 +53,22 @@ public class PathPlanner {
         // built initial solution
         SolutionBuilder sb = null;
         switch (sbType) {
-            case "bfs":     sb = new BfsSolutionBuilder(architecture);
+            case "bfs":
+                sb = new BfsSolutionBuilder(architecture);
                 System.out.println("Initialising BfsSolutionBuilder");
-                            break;
-            case "astar":   sb = new AStarSolutionBuilder(architecture);
+                break;
+            case "astar":
+                sb = new AStarSolutionBuilder(architecture);
                 System.out.println("Initialising AStarSolutionBuilder");
-                            break;
-            case "rnd":     sb = new RandomSolutionBuilder(architecture);
+                break;
+            case "rnd":
+                sb = new RandomSolutionBuilder(architecture);
                 System.out.println("Initialising RandomSolutionBuilder");
-                            break;
-            default:        System.err.println("invalid initial solution builder name.");
-                            printHelp();
-                            System.exit(-1);
+                break;
+            default:
+                System.err.println("invalid initial solution builder name.");
+                printHelp();
+                System.exit(-1);
         }
 
         List<List<Integer>> initSol = sb.builtSolution();
@@ -72,21 +76,22 @@ public class PathPlanner {
         // run optimization
         MetaHeuristic mh = null;
         switch (mhType) {
-            case "sa":      mh = new SA(architecture, 0.99f, 100, initSol);
+            case "sa":
+                mh = new SA(architecture, nn, 0.95f, 100, initSol);
                 System.out.println("Initialising SA");
-
                 break;
             case "ga":
-                mh = new GA(architecture, 100, 100, 100);
-
+                mh = new GA(architecture, nn, 100, 100, 100);
                 System.out.println("Initialising GA");
-                            break;
-            case "test":    mh = new TestMH(architecture);
+                break;
+            case "test":
+                mh = new TestMH(architecture, nn);
                 System.out.println("Initialising TestMH");
-                            break;
-            default:        System.err.println("invalid metaheuristic name.");
-                            printHelp();
-                            System.exit(-1);
+                break;
+            default:
+                System.err.println("invalid metaheuristic name.");
+                printHelp();
+                System.exit(-1);
         }
 
         // safe initial solution for later eval
@@ -121,7 +126,8 @@ public class PathPlanner {
         String sbType = parsedArgs.get(2);
         String mhType = parsedArgs.get(3);
         int runTimeSeconds = Integer.parseInt(parsedArgs.get(4));
+        int nn = Integer.parseInt(parsedArgs.get(5));
 
-        run(pIn, pOut, sbType, mhType, runTimeSeconds);
+        run(pIn, pOut, sbType, mhType, runTimeSeconds, nn);
     }
 }

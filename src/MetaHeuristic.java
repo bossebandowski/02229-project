@@ -1,48 +1,45 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class MetaHeuristic {
 
     protected Architecture a;
+    protected int nn;
     protected List<List<Integer>> bestSolution;
 
-    public MetaHeuristic(Architecture a) {
+    public MetaHeuristic(Architecture a, int nn) {
         this.a = a;
+        this.nn = nn;
     }
 
     public abstract void run(int runtimeSeconds);
 
-    public int[][] initializeOverlapGraph(List<List<Integer>> solutions) {
-        //Select route in current solution
 
-        int[][] graph = new int[a.getGraph().length][a.getGraph()[0].length];
-
-        //generate graph with overlap counter
-
-        for (int row = 0; row < a.getGraph().length; row++){
-            for (int column = 0; column < a.getGraph()[row].length; column++){
-                if (a.getGraph()[row][column] != -1){
-                    graph[row][column]=0;
-                }else{ graph[row][column]=-1;}
-            }
+    public List<List<Integer>> generateNeighborhood(List<List<Integer>> solution, int mode) {
+        switch (mode) {
+            case 0:
+                return nn0(solution, 3);
+            case 1:
+                return nn1(solution);
+            default:
+                if (Math.random() < 0.5) {
+                    return nn0(solution, 3);
+                } else {
+                    return nn1(solution);
+                }
         }
-
-        for (List<Integer> route : solutions){
-            for (int node = 0; node < route.size()-1;node++){
-                graph[route.get(node)][route.get(node+1)] +=1;
-            }
-        }
-
-        return graph;
     }
 
-    public List<List<Integer>> generateNeighborhood(List<List<Integer>> solution,Integer numPaths ){
+    // computes k shortest routes between two endpoints while respecting overlap constraints and replaces a random one
+    public List<List<Integer>> nn0(List<List<Integer>> solution, Integer numPaths) {
         //Generates a neighborhood for a random
-        int[][] overlapGraph = initializeOverlapGraph( solution);
+        int[][] overlapGraph = initializeOverlapGraph(solution);
 
         //Picks random route in solution list to work on
         int ranSolutionIndex = new Random().nextInt(solution.size());
@@ -50,15 +47,15 @@ public abstract class MetaHeuristic {
         // System.out.println(ranSolutionIndex);
 
         Node src = a.getNodes().get(shortestPath.get(0));
-        Node dest = a.getNodes().get(shortestPath.get(shortestPath.size()-1));
+        Node dest = a.getNodes().get(shortestPath.get(shortestPath.size() - 1));
 
-        List<List<Integer>> shortestPaths  = new ArrayList<>(numPaths);
-        for (int i = 0; i < numPaths; i++){
+        List<List<Integer>> shortestPaths = new ArrayList<>(numPaths);
+        for (int i = 0; i < numPaths; i++) {
 
             List<Integer> shortPath = BFS(src, dest, overlapGraph);
 
-            for (int node = 0; node < shortPath.size()-1; node++){
-                overlapGraph[shortPath.get(node)][shortPath.get(node+1)] += 1;
+            for (int node = 0; node < shortPath.size() - 1; node++) {
+                overlapGraph[shortPath.get(node)][shortPath.get(node + 1)] += 1;
             }
             shortestPaths.add(shortPath);
         }
@@ -69,8 +66,33 @@ public abstract class MetaHeuristic {
 
 
         //Replace the random route with the new solution
-        solution.set(ranSolutionIndex,newRoute);
+        solution.set(ranSolutionIndex, newRoute);
 
+        return solution;
+    }
+
+    // replaces a route segment between two nodes with a random new segment between the same nodes
+    public List<List<Integer>> nn1(List<List<Integer>> solution) {
+        // get random route
+        int routeId = (int) (Math.random()*solution.size());
+        int nodeId1 = (int) (Math.random()*solution.get(routeId).size());
+        int nodeId2 = (int) (Math.random()*solution.get(routeId).size());
+
+        // make sure that the route segment is calculated between two distinct nodes
+        while (solution.get(routeId).get(nodeId1) == solution.get(routeId).get(nodeId2)) {
+            nodeId2 = (int) Math.floor(Math.random()*solution.get(routeId).size());
+        }
+
+        // get new route Segment
+        List<Integer> newRoute;
+
+        if (nodeId1 < nodeId2) {
+            newRoute = replaceRndSegment(nodeId1, nodeId2, solution.get(routeId));
+        } else {
+            newRoute = replaceRndSegment(nodeId2, nodeId1, solution.get(routeId));
+        }
+
+        solution.set(routeId, newRoute);
         return solution;
     }
 
@@ -96,6 +118,68 @@ public abstract class MetaHeuristic {
     }
 
     // auxiliary functions
+    private List<Integer> replaceRndSegment(int from, int to, List<Integer> route) {
+        List<Integer> head = new ArrayList<>();
+        List<Integer> tail = new ArrayList<>();
+
+        for (int i = 0; i < from; i++) {
+            head.add(route.get(i));
+        }
+
+        for (int i = to + 1; i < route.size(); i++) {
+            tail.add(route.get(i));
+        }
+
+        // initialise randomised DFS for new route segment
+        List<Node> stack = new LinkedList<>();
+        stack.add(a.getNodes().get(route.get(from)));
+        int curId = route.get(from);
+        int[] visited = new int[a.getNodes().size()];
+        int[] parents = new int[a.getNodes().size()];
+        Arrays.fill(visited, 0);
+        Arrays.fill(parents, -1);
+        List<Node> children;
+        Node curNode;
+        Node child;
+
+        // run randomised DFS for new route segment
+        while (!(curId == route.get(to))) {
+            curNode = stack.remove(stack.size() - 1);
+            children = curNode.getChildren();
+            curId = curNode.getId();
+            visited[curId] = 1;
+
+            while (!children.isEmpty()) {
+                child = children.remove((int) (Math.random() * children.size()));
+                if (visited[child.getId()] == 0) {
+                    stack.add(child);
+                    parents[child.getId()] = curId;
+                }
+            }
+        }
+
+        // target node has been found, path from init node to target node can be extracted via parents array
+        List<Integer> body = new ArrayList<>();
+
+        // reverse order
+        body.add(0, route.get(to));
+        int parent_id = parents[route.get(to)];
+        while (!(parent_id == route.get(from))) {
+            body.add(0, parent_id);
+            parent_id = parents[parent_id];
+        }
+        body.add(0, route.get(from));
+
+        List<Integer> newRoute = new ArrayList<>();
+
+        newRoute.addAll(head);
+        newRoute.addAll(body);
+        newRoute.addAll(tail);
+
+        return newRoute;
+    }
+
+
     private void calculateMaxLinkDelays(List<List<Integer>> solution) {
         float[] dataTransferred = new float[this.a.getLinks().size()];
         Arrays.fill(dataTransferred, 0f);
@@ -121,7 +205,7 @@ public abstract class MetaHeuristic {
 
         for (int i = 0; i < dataTransferred.length; i++) {
             Link l = this.a.getLinks().get(i);
-            l.setC(dataTransferred[i]/l.getSpeed());
+            l.setC(dataTransferred[i] / l.getSpeed());
         }
     }
 
@@ -138,7 +222,7 @@ public abstract class MetaHeuristic {
             // get stream period
             float period = s.getPeriod();
             float size = s.getSize();
-            float bwReq = size/period;
+            float bwReq = size / period;
 
             // iterate over all routes associated with the stream
             for (int rep = 0; rep < s.getRl(); rep++) {
@@ -180,7 +264,7 @@ public abstract class MetaHeuristic {
 
             for (Node child : n.getChildren()) {
 
-                if(shortest_path_time[n.getId()] + graph[n.getId()][child.getId()] < shortest_path_time[child.getId()]) {
+                if (shortest_path_time[n.getId()] + graph[n.getId()][child.getId()] < shortest_path_time[child.getId()]) {
                     queue.add(child);
                     shortest_path_time[child.getId()] = shortest_path_time[n.getId()] + graph[n.getId()][child.getId()];
                     parent_ids[child.getId()] = n.getId();
@@ -202,18 +286,44 @@ public abstract class MetaHeuristic {
         return route;
     }
 
-    public void printGraph( int[][] graph){
+    public void printGraph(int[][] graph) {
 
         System.out.println("NEW GRAPH");
-        for (int row = 0; row < graph.length; row++){
+        for (int row = 0; row < graph.length; row++) {
 
-            for (int column = 0; column < graph[row].length; column++){
+            for (int column = 0; column < graph[row].length; column++) {
                 System.out.print(graph[row][column] + " ");
             }
-            System.out.println(" ---------- " + row  );
+            System.out.println(" ---------- " + row);
 
 
         }
+    }
+
+    public int[][] initializeOverlapGraph(List<List<Integer>> solutions) {
+        //Select route in current solution
+
+        int[][] graph = new int[a.getGraph().length][a.getGraph()[0].length];
+
+        //generate graph with overlap counter
+
+        for (int row = 0; row < a.getGraph().length; row++) {
+            for (int column = 0; column < a.getGraph()[row].length; column++) {
+                if (a.getGraph()[row][column] != -1) {
+                    graph[row][column] = 0;
+                } else {
+                    graph[row][column] = -1;
+                }
+            }
+        }
+
+        for (List<Integer> route : solutions) {
+            for (int node = 0; node < route.size() - 1; node++) {
+                graph[route.get(node)][route.get(node + 1)] += 1;
+            }
+        }
+
+        return graph;
     }
 
     public List<List<Integer>> createSolutionCopy(List<List<Integer>> solution) {
@@ -279,7 +389,7 @@ public abstract class MetaHeuristic {
         float cost = 0f;
 
         for (Link l : this.a.getLinks()) {
-            cost += 1 - (usedBandwidth.get(l.getId())/l.getSpeed());
+            cost += 1 - (usedBandwidth.get(l.getId()) / l.getSpeed());
         }
 
         return cost;
@@ -371,7 +481,7 @@ public abstract class MetaHeuristic {
                 }
 
                 // add to cost
-                cost += t/deadline;
+                cost += t / deadline;
 
                 // check next route
                 idx++;

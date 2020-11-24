@@ -6,8 +6,8 @@ public class SA extends MetaHeuristic {
     private List<List<Integer>> solution;
 
 
-    public SA(Architecture a, float alpha, float t_start, List<List<Integer>> solution) {
-        super(a);
+    public SA(Architecture a, int nn, float alpha, float t_start, List<List<Integer>> solution) {
+        super(a, nn);
         this.alpha = alpha;
         this.t_start = t_start;
         this.solution = solution;

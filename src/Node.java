@@ -21,7 +21,9 @@ public class Node {
         this.children.add(child);
     }
     public ArrayList<Node> getChildren() {
-        return this.children;
+        ArrayList<Node> out = new ArrayList<>();
+        for (Node child : this.children) out.add(child);
+        return out;
     }
 
     public static int getCount() {
