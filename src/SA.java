@@ -23,7 +23,7 @@ public class SA extends MetaHeuristic {
         long t0 = System.currentTimeMillis();
 
         while ((System.currentTimeMillis() - t0)/1000f < runtimeSeconds) {
-            next = generateNeighborhood(s_i,3);
+            next = generateNeighborhood(s_i,1);
 
             float costCurrent = calculateCostFunction(s_i);
             float costNext = calculateCostFunction(next);

@@ -67,8 +67,7 @@ public abstract class MetaHeuristic {
         //Choose a random path in the generated shortestPaths
         int ranIndex = new Random().nextInt(numPaths);
         List<Integer> newRoute = shortestPaths.get(ranIndex);
-
-
+        
         //Replace the random route with the new solution
         newSolution.set(ranSolutionIndex,newRoute);
 
