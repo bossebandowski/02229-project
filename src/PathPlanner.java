@@ -97,6 +97,8 @@ public class PathPlanner {
         // safe initial solution for later eval
         List<List<Integer>> solutionCopy = mh.createSolutionCopy(initSol);
 
+        System.out.println("Neighbourhood function : " + nn);
+
         // run metaheuristic
         System.out.println("Running optimisation for " + runTime + "s...");
         mh.run(runTime);
