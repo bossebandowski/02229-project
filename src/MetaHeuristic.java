@@ -1,11 +1,9 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class MetaHeuristic {
 
@@ -41,6 +39,7 @@ public abstract class MetaHeuristic {
         //Generates a neighborhood for a random
         int[][] overlapGraph = initializeOverlapGraph(solution);
 
+        List<List<Integer>> newSolution = createSolutionCopy(solution);
         //Picks random route in solution list to work on
         int ranSolutionIndex = new Random().nextInt(solution.size());
         List<Integer> shortestPath = solution.get(ranSolutionIndex);
@@ -64,41 +63,17 @@ public abstract class MetaHeuristic {
         int ranIndex = new Random().nextInt(numPaths);
         List<Integer> newRoute = shortestPaths.get(ranIndex);
 
-
         //Replace the random route with the new solution
         solution.set(ranSolutionIndex, newRoute);
+        newSolution.set(ranSolutionIndex,newRoute);
 
-        return solution;
-    }
 
-    // replaces a route segment between two nodes with a random new segment between the same nodes
-    public List<List<Integer>> nn1(List<List<Integer>> solution) {
-        // get random route
-        int routeId = (int) (Math.random()*solution.size());
-        int nodeId1 = (int) (Math.random()*solution.get(routeId).size());
-        int nodeId2 = (int) (Math.random()*solution.get(routeId).size());
 
-        // make sure that the route segment is calculated between two distinct nodes
-        while (solution.get(routeId).get(nodeId1) == solution.get(routeId).get(nodeId2)) {
-            nodeId2 = (int) Math.floor(Math.random()*solution.get(routeId).size());
-        }
-
-        // get new route Segment
-        List<Integer> newRoute;
-
-        if (nodeId1 < nodeId2) {
-            newRoute = replaceRndSegment(nodeId1, nodeId2, solution.get(routeId));
-        } else {
-            newRoute = replaceRndSegment(nodeId2, nodeId1, solution.get(routeId));
-        }
-
-        solution.set(routeId, newRoute);
-        return solution;
+        return newSolution;
     }
 
     public float calculateCostFunction(List<List<Integer>> solution) {
         float result;
-
         final float bandwidthCoeff = 1f;
         final float overlapCoeff = 1f;
         final float routeLengthCoeff = 1f;
