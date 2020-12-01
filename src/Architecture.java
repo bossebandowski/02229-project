@@ -90,6 +90,18 @@ public class Architecture {
         return null;
     }
 
+    public Stream getStream(int source, int destination)
+    {
+        for (Stream stream : this.streams) {
+            if(stream.getSource().getId() == source && stream.getDestination().getId() == destination)
+            {
+                return stream;
+            }
+        }
+        System.err.println("The requested Stream does not found!");
+        return null;
+    }
+
     public Link getLink(int startID, int endID)
     {
         for (Link link : this.links) {
@@ -109,6 +121,18 @@ public class Architecture {
             if(currentLink.getId() == linkID)
             {
                 return currentLink;
+            }
+        }
+        return null;
+    }
+
+    public Node getNodeByID(int nodeID)
+    {
+        for(Node currentNode:nodes)
+        {
+            if(currentNode.getId() == nodeID)
+            {
+                return currentNode;
             }
         }
         return null;

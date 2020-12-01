@@ -136,51 +136,73 @@ public class GA extends MetaHeuristic
     private List<Integer> generateChildRoute(List<Integer> parentRoute1,List<Integer> parentRoute2)
     {
         List<Integer> generatedChildRoute = new ArrayList<>();
-        //generatedChildRoute = parentRoute1;
-        boolean foundCommonNode = false;
-        int nodeToChangeIndex1 = -1;
-        int nodeToChangeIndex2 = -1;
-        int returnIndex1 = -1;
-        int returnIndex2 = -1;
-        int maxTry = parentRoute1.size();
-        int probes = 0;
-        while (!foundCommonNode && probes <= maxTry) {
-            nodeToChangeIndex1 = rand.nextInt(parentRoute1.size()-2) + 1;
-            nodeToChangeIndex2 = -1;
-            int nodeToChange = parentRoute1.get(nodeToChangeIndex1);
-            for (int i = 0; i < parentRoute2.size(); i++) {
-                if (parentRoute2.get(i) == nodeToChange) {
-                    nodeToChangeIndex2 = i;
-                    foundCommonNode = true;
-                }
-            }
-            if(!foundCommonNode)
+        generatedChildRoute.addAll(parentRoute1);
+        List<Integer> commons = new ArrayList<>();
+        for(int i = 0; i < parentRoute1.size(); i++)
+        {
+            for(int k = 0; k < parentRoute2.size(); k++)
             {
-                continue;
-            }
-            // Find return node (worst case this is the destination node)
-            for (int i = nodeToChangeIndex1 + 1; i < parentRoute1.size(); i++) {
-                for (int k = nodeToChangeIndex2 + 1; k < parentRoute2.size(); k++) {
-                    if (parentRoute1.get(i) == parentRoute2.get(k)) {
-                        returnIndex1 = i;
-                        returnIndex2 = k;
-                    }
+                if(parentRoute1.get(i) == parentRoute2.get(k) && i != 0 && i != (parentRoute1.size() - 1))
+                {
+                    commons.add(parentRoute1.get(i));
                 }
             }
         }
-        // Copy the remaining nodes from parent1 to result
-        for (int i = 0; i < nodeToChangeIndex1; i++) {
-            generatedChildRoute.add(parentRoute1.get(i));
+        // if there is no common node return by one a mutated child since crossover is not possible
+        if(commons.size() == 0)
+        {
+            generatedChildRoute = _sb.generateRandomRoute(a.getStream(parentRoute1.get(0),parentRoute1.get(parentRoute1.size()-1)));
+            return generatedChildRoute;
         }
-        // Copy the nodes from the parent2
-        for (int i = nodeToChangeIndex2; i < returnIndex2; i++) {
-            generatedChildRoute.add(parentRoute2.get(i));
-        }
-        // Copy last elements of parent1
-        for (int i = returnIndex1; i < parentRoute1.size(); i++) {
-            generatedChildRoute.add(parentRoute1.get(i));
-        }
+        //If only one node common then there is no return
+        if(commons.size() == 1)
+        {
+            generatedChildRoute.clear();
+            int index = 0;
+            while(parentRoute1.get(index) != commons.get(0))
+            {
+                generatedChildRoute.add(parentRoute1.get(index));
+                index++;
+            }
+            int index2 = -1;
+            for(int i = 0; i < parentRoute2.size(); i++)
+            {
+                if(commons.get(0) == parentRoute2.get(i))
+                {
+                    index2 = i;
+                    break;
+                }
+            }
+            for(int i = index2; i < parentRoute2.size(); i++)
+            {
+                generatedChildRoute.add(parentRoute2.get(i));
+            }
 
+        }
+        else if(commons.size() > 2)
+        {
+            generatedChildRoute.clear();
+            int random1 = rand.nextInt(commons.size() - 1);
+            int index = 0;
+            while(parentRoute1.get(index) != commons.get(random1))
+            {
+                generatedChildRoute.add(parentRoute1.get(index));
+                index++;
+            }
+            int index2 = -1;
+            for(int i = 0; i < parentRoute2.size(); i++)
+            {
+                if(commons.get(random1) == parentRoute2.get(i))
+                {
+                    index2 = i;
+                    break;
+                }
+            }
+            for(int i = index2; i < parentRoute2.size(); i++)
+            {
+                generatedChildRoute.add(parentRoute2.get(i));
+            }
+        }
         return generatedChildRoute;
     }
 
@@ -188,6 +210,7 @@ public class GA extends MetaHeuristic
     @Override
     public void run(int runtimeSeconds)
     {
+
         long initTime = System.currentTimeMillis();
         while((System.currentTimeMillis() - initTime)/1000 < runtimeSeconds)
         {
@@ -207,6 +230,7 @@ public class GA extends MetaHeuristic
                 selectedChildren.add(generatedChildren.get(rand2));
             }
             _population.addAll(selectedChildren);
+            prepareFinalSolution();
         }
         prepareFinalSolution();
     }
