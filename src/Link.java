@@ -9,6 +9,7 @@ public class Link {
     private float c = 0f;
 
     private float leftoverbandwidth;
+    private float usedbandwidth;
 
     public Link(Node start, Node end, float speed) {
         this.start = start;
@@ -17,6 +18,7 @@ public class Link {
         this.id = count;
         count++;
         this.leftoverbandwidth = speed;
+        this.usedbandwidth = 0;
     }
 
     public Node getStart() {
@@ -51,7 +53,10 @@ public class Link {
 
     public float getLeftoverbandwidth(){ return leftoverbandwidth;}
 
+    public float getUsedbandwidth(){ return usedbandwidth;}
+
     public void addStream(Stream stream) {
+        this.usedbandwidth += stream.getBandwith();
         this.leftoverbandwidth -= stream.getBandwith();
 //        System.out.println(this.id + " has " + leftoverbandwidth + "byte/micro sec");
     }
