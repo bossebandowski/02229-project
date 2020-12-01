@@ -12,10 +12,7 @@ public abstract class MetaHeuristic {
     protected Architecture a;
     protected int nn;
     protected List<List<Integer>> bestSolution;
-    private enum neighbourhood_funcs {
-        GENERATE_SHORT,
-        GENERATE_SIMPLE
-    }
+
     public MetaHeuristic(Architecture a, int nn) {
         this.a = a;
         this.nn = nn;

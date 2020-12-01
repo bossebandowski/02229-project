@@ -44,7 +44,7 @@ java router.PathPlanner -sb rnd
 #### Iterative Metaheuristic
 This defines the optimization strategy. We have implemented a version of the simulated annealing metaheuristic ("sa")
 and a genetic algorithm with tournament selection ("ga"). **The genetic algorithm is only compatible with the random
-neighbourhood function**.
+neighbourhood function and solution builder**.
 You can change this parameter by adding the following flag:
 ```bash
 java router.PathPlanner -mh sa
@@ -59,7 +59,7 @@ java router.PathPlanner -rt 300
 ...
 ```
 #### Neighbourhood Function
-The neighbourhood function is used by the iterative metaheuristics to generate solutions that are similar to the current
+The neighbourhood function is used by the simmulated annealing algorithm to generate solutions that are similar to the current
 one. We implemented one neighbourhood function that replaces a segment of one route in the solution with a
 randomly generate new segment. The only constraint is that the nodes must be connected to each other as defined by the
 input file.

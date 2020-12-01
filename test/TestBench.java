@@ -19,11 +19,11 @@ class TestBench {
     private static final String timesPath = "../data/times.csv";
     private static final String runtime = "1";
     private static final String[] nns = {"-1", "0", "1"};
-    private static final String[] mhs = {"sa", "ga"};
+    private static final String[] mhs = {"ga"}; //"sa",
     private static final String[] sbs = {"rnd", "astar", "bfs"};
     private static final Map<String, Float> targetScores = new HashMap<>();
-    private static final int runs = 1;
-    private static final String runtimeBound = "60";
+    private static final int runs = 2;
+    private static final String runtimeBound = "5";
     private static final float targetFactor = 1.01f;
 
     static void runtimeTest() throws IOException {
@@ -51,7 +51,17 @@ class TestBench {
                     }
                 }
             } else {
-                System.out.println("Automated testing for GA not implemented yet");
+                for (String file : inputFiles) {
+                    for (int i = 0; i < runs; i++) {
+                        out = String.join("_", "../solutions/scores/res", mh, file.substring(8,11), String.valueOf(i), ".xml");
+                        System.out.println(out + " ... ");
+                        res = router.PathPlanner.run(file, out, "rnd", mh, Integer.parseInt(runtime), 0, 0);
+                        score = res.firstEntry().getValue();
+                        scoreLine = String.join(";", mh, "", "", file.substring(8,11), String.valueOf(i), score + "\n");
+                        costs.append(scoreLine);
+                        System.out.printf("Score: %.2f\n", score);
+                    }
+                }
             }
         }
         costs.flush();
@@ -125,7 +135,19 @@ class TestBench {
                     }
                 }
             } else {
-                System.out.println("Automated testing for GA not implemented yet");
+                for (String file : inputFiles) {
+                    if (!(file.startsWith("TC2", 8))) {
+                        for (int i = 0; i < runs; i++) {
+                            out = String.join("_", "../solutions/times/res", mh, file.substring(8,11), String.valueOf(i), ".xml");
+                            System.out.println(out + " ... ");
+                            res = router.PathPlanner.run(file, out, "rnd", mh, Integer.parseInt(runtimeBound), 0, targetScores.get(file.substring(8, 11)));
+                            time = res.firstEntry().getKey();
+                            scoreLine = String.join(";", mh, "", "", file.substring(8,11), String.valueOf(i), time + "\n");
+                            times.append(scoreLine);
+                            System.out.printf("Time: %.2fs\n", (float) (time/1000));
+                        }
+                    }
+                }
             }
         }
         times.flush();
@@ -136,8 +158,8 @@ class TestBench {
         System.out.println("Runtime test");
         System.out.println("============");
         System.out.println("============");
-        // runtimeTest();
-        targetScoreTest();
+        runtimeTest();
+        // targetScoreTest();
     }
 }
 
