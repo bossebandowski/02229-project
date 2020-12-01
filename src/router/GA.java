@@ -25,6 +25,7 @@ public class GA extends MetaHeuristic {
         this._population = new ArrayList<>();
         this._populationFitness = new ArrayList<>();
         this.solutionCopy = new ArrayList<>();
+        this.bestSolution = createSolutionCopy(initSol);
         solutionCopy.addAll(initSol);
         generateInitPopulation();
         calculateFitness();
@@ -192,10 +193,7 @@ public class GA extends MetaHeuristic {
                 selectedChildren.addAll(generatedChildren);
             }
             prepareFinalSolution();
-            /*try {
-                currentScore = calculateCostFunction(this.bestSolution);
-            } catch (NullPointerException ignore) {
-            }*/
+            currentScore = calculateCostFunction(this.bestSolution);
         }
     }
 
