@@ -19,6 +19,10 @@ public class Node {
         count++;
     }
 
+    public static void resetCount() {
+        count = 0;
+    }
+
     public void addChild(Node child) {
         this.children.add(child);
     }

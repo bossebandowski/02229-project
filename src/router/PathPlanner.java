@@ -45,7 +45,7 @@ public class PathPlanner {
         }
     }
 
-    public static void run(String pIn, String pOut, String sbType, String mhType, int runTime, int nn) {
+    public static float run(String pIn, String pOut, String sbType, String mhType, int runTime, int nn) {
 
         // built problem model
         IOInterface ioHandler = new IOInterface();
@@ -106,13 +106,15 @@ public class PathPlanner {
         mh.run(runTime);
         // extract solution
         List<List<Integer>> best = mh.getSolution();
+        float cost = mh.calculateCostFunction(best);
 
         System.out.printf("Initial cost:\t %.2f\n", mh.calculateCostFunction(solutionCopy));
-        System.out.printf("Optimized cost:\t %.2f\n", mh.calculateCostFunction(best));
+        System.out.printf("Optimized cost:\t %.2f\n", cost);
 
         // verify solution
         System.out.print("Checking viability...");
-        if (mh.isViable(best)) {
+        boolean isViable = mh.isViable(best);
+        if (isViable) {
             System.out.println("ok");
         } else {
             System.out.println("ERR");
@@ -121,6 +123,25 @@ public class PathPlanner {
         // write output to file
         System.out.println("Writing solution to " + pOut);
         ioHandler.writeSolution(initSol, pOut, "testName");
+
+        // recycle
+        architecture = null;
+        sb = null;
+        mh = null;
+        initSol = null;
+        solutionCopy = null;
+        best = null;
+        ioHandler = null;
+        // reset counts
+        Node.resetCount();
+        Link.resetCount();
+        Stream.resetCount();
+
+        if (isViable) {
+            return cost;
+        } else {
+            return -1f;
+        }
     }
 
     public static void main(String[] args) throws Exception {

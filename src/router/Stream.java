@@ -24,6 +24,10 @@ public class Stream {
         count++;
     }
 
+    public static void resetCount() {
+        count = 0;
+    }
+
     public static int getCount() {
         return count;
     }

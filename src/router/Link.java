@@ -23,6 +23,10 @@ public class Link {
         this.usedbandwidth = 0;
     }
 
+    public static void resetCount() {
+        count = 0;
+    }
+
     public Node getStart() {
         return start;
     }
