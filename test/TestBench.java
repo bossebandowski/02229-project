@@ -14,7 +14,7 @@ class TestBench {
             "../data/TC6_large2.app_network_description",
             "../data/TC7_huge.app_network_description"};
     private static final String scores_path = "../data/scores.csv";
-    private static final String runtime = "1";
+    private static final String runtime = "10";
     private static final String[] nns = {"-1", "0", "1"};
     private static final String[] mhs = {"sa", "ga"};
     private static final String[] sbs = {"rnd", "astar", "bfs"};
