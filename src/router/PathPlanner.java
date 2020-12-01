@@ -85,7 +85,7 @@ public class PathPlanner {
                 System.out.println("Initialising SA");
                 break;
             case "ga":
-                mh = new GA(architecture, nn, 100, 100, 100);
+                mh = new GA(architecture, nn, 100, 100, 100, initSol);
                 System.out.println("Initialising GA");
                 break;
             case "test":
