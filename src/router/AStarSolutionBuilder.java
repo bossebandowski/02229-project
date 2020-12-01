@@ -31,7 +31,6 @@ public class AStarSolutionBuilder extends SolutionBuilder{
         ArrayList<Node> localPath = new ArrayList<Node>();
 
         calc_path_scores(src, dests, discovered, localPath);
-        System.out.println("done");
         // dfs for h
         // for unexplored, want to see which end systems they connect to.
     }
@@ -41,10 +40,8 @@ public class AStarSolutionBuilder extends SolutionBuilder{
             int path_length = localPath.size();
             int[][] h = new int[this.a.getNodes().size()][this.a.getNodes().size()];
 
-            System.out.println("Got path of size: " + path_length);
             for (Node pathNod : localPath) {
                 path_length -= 1;
-                System.out.println(pathNod.getName() + " d: " + path_length);
                 this.h[pathNod.getId()][dests.getId()] = path_length;
             }
         }
@@ -72,31 +69,26 @@ public class AStarSolutionBuilder extends SolutionBuilder{
         Node currentNode = src;
         Link currentBest_link = null;
         while (!currentNode.getName().equals(dest.getName())) {
-            System.out.println(currentNode.getName());
             float best_link_score = 9999999;
             for (Node child : currentNode.getChildren()) {
                 int link_id = this.a.getGraph()[currentNode.getId()][child.getId()];
                 Link link = this.a.getLinks().get(link_id);
 
-                System.out.println("    child: " + child.getName());
                 if (child.equals(dest)) {
                     currentBest_link = link;
                     break;
                 }
 
                 if (this.h[child.getId()][dest.getId()] == 0) {
-                    System.out.println("Bad");
                     continue;
                 }
 
                 // seek the link with smallest score(pnalty) = used bandiwdth + distance to dest
                 float link_score = link.getUsedbandwidth() * 10 + this.h[child.getId()][dest.getId()];
 
-                System.out.println("Score: " + link_score);
 
                 if (link_score < best_link_score || link.getEnd().equals(dest)) {
                     best_link_score = link_score;
-                    System.out.println("New link is better. " + currentNode.getName() + "->" + child.getName());
                     currentBest_link = link;
                 } else {
                     continue;
@@ -107,7 +99,6 @@ public class AStarSolutionBuilder extends SolutionBuilder{
             route.add(currentBest_link.getEnd().getId());
             currentNode = currentBest_link.getEnd();
         }
-        System.out.println("------------Got destination------------");
         return route;
     }
 
@@ -126,15 +117,7 @@ public class AStarSolutionBuilder extends SolutionBuilder{
                 initSolution.add(route);
             }
         }
-        int count = 0;
-        for (List<Integer> route : initSolution) {
-            System.out.println("Route " + count);
-            for (Integer i : route) {
-                System.out.print(a.getNodes().get(i).getName() + " -> ");
-            }
-            System.out.println("|");
-            count++;
-        }
+
         return initSolution;
     }
 }

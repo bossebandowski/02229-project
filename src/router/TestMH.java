@@ -7,7 +7,7 @@ public class TestMH extends MetaHeuristic{
     }
 
     @Override
-    public void run(int runtimeSeconds) {
+    public void run(int runtimeSeconds, float targetScore, long initTime) {
     }
 
 }

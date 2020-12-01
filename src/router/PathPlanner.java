@@ -1,9 +1,7 @@
 package router;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 public class PathPlanner {
@@ -45,12 +43,16 @@ public class PathPlanner {
         }
     }
 
-    public static float run(String pIn, String pOut, String sbType, String mhType, int runTime, int nn) {
+    public static TreeMap<Long, Float> run(String pIn, String pOut, String sbType, String mhType, int runTime, int nn, float targetScore) {
+        TreeMap<Long, Float> out = new TreeMap<>();
 
         // built problem model
         IOInterface ioHandler = new IOInterface();
         Architecture architecture = ioHandler.parse(pIn);
         architecture.buildGraph();
+
+        // record starting time
+        long initTime = System.currentTimeMillis();
 
         // built initial solution
         SolutionBuilder sb = null;
@@ -102,8 +104,11 @@ public class PathPlanner {
         System.out.println("Neighbourhood function : " + nn);
 
         // run metaheuristic
-        System.out.println("Running optimisation for " + runTime + "s...");
-        mh.run(runTime);
+        System.out.println("Running optimisation for up to " + runTime + "s...");
+        System.out.println("Target score: " + targetScore);
+        mh.run(runTime, targetScore, initTime);
+        long finalTime = System.currentTimeMillis();
+
         // extract solution
         List<List<Integer>> best = mh.getSolution();
         float cost = mh.calculateCostFunction(best);
@@ -138,10 +143,12 @@ public class PathPlanner {
         Stream.resetCount();
 
         if (isViable) {
-            return cost;
+            out.put(finalTime-initTime, cost);
         } else {
-            return -1f;
+            out.put(-1L, -1f);
         }
+
+        return out;
     }
 
     public static void main(String[] args) throws Exception {
@@ -153,6 +160,6 @@ public class PathPlanner {
         int runTimeSeconds = Integer.parseInt(parsedArgs.get(4));
         int nn = Integer.parseInt(parsedArgs.get(5));
 
-        run(pIn, pOut, sbType, mhType, runTimeSeconds, nn);
+        run(pIn, pOut, sbType, mhType, runTimeSeconds, nn, 0);
     }
 }

@@ -210,10 +210,7 @@ public class GA extends MetaHeuristic
 
 
     @Override
-    public void run(int runtimeSeconds)
-    {
-
-        long initTime = System.currentTimeMillis();
+    public void run(int runtimeSeconds, float targetScore, long initTime) {
         while((System.currentTimeMillis() - initTime)/1000 < runtimeSeconds)
         {
             calculateFitness();

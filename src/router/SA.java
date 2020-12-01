@@ -17,14 +17,13 @@ public class SA extends MetaHeuristic {
 
 
     @Override
-    public void run(int runtimeSeconds) {
+    public void run(int runtimeSeconds, float targetCost, long t0) {
+        float currentBestScore = Float.MAX_VALUE;
         List<List<Integer>> s_i = solution;
         float t = t_start;
         List<List<Integer>> next = null;
 
-        long t0 = System.currentTimeMillis();
-
-        while ((System.currentTimeMillis() - t0)/1000f < runtimeSeconds) {
+        while (((System.currentTimeMillis() - t0)/1000f < runtimeSeconds) && (targetCost < currentBestScore)) {
             next = generateNeighborhood(s_i,1);
 
             float costCurrent = calculateCostFunction(s_i);
@@ -35,6 +34,7 @@ public class SA extends MetaHeuristic {
             if (delta > 0 || p(delta, t)) {
                 s_i = next;
                 t = t*alpha;
+                currentBestScore = costNext;
             }
         }
 

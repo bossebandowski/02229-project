@@ -21,7 +21,7 @@ public abstract class MetaHeuristic {
         this.nn = nn;
     }
 
-    public abstract void run(int runtimeSeconds);
+    public abstract void run(int runtimeSeconds, float targetScore, long initTime);
 
 
     public List<List<Integer>> generateNeighborhood(List<List<Integer>> solution, int mode) {
@@ -103,7 +103,7 @@ public abstract class MetaHeuristic {
     public float calculateCostFunction(List<List<Integer>> solution) {
         float result;
         final float bandwidthCoeff = 1f;
-        final float overlapCoeff = 1f;
+        final float overlapCoeff = 10f;
         final float routeLengthCoeff = 1f;
         final float delayCoeff = 1f;
 
