@@ -79,9 +79,22 @@ java router.PathPlanner -nn 0
 java router.PathPlanner -nn 1
 ```
 
-###Examples
+###Example
 
 Run the genetic algorithm on the huge test file for 30 seconds with random initial solutions:
 ```
 java router.PathPlanner -rt 30 -in "../data/TC7_huge.app_network_description" -mh ga -sb rnd
+```
+
+## Automated Testing
+In order to evaluate the different combinations of settings, we added a testbench to the project which automatically
+generates solutions for all possible configurations and consolidates the scores. It requires a folder "./data" containing
+all provided test cases and another folder "./solutions" where the output files will be saved. Additionally, it creates
+a summary file under "./data/scores.csv".
+The automated testing can be invoked by the following
+commands (**CAREFUL: LONG RUNTIME**):
+```
+cd path/to/test
+javac -cp ".;../src" *.java
+java -cp ".;../src" TestBench
 ```
