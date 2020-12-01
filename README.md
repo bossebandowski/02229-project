@@ -8,7 +8,7 @@ traffic in vehicles. For details, check https://ieeexplore.ieee.org/document/840
 ```bash
 cd path/to/src
 javac router/*.java
-java router/PathPlanner
+java router.PathPlanner
 ``` 
 This will invoke the programme with default parameters. Those are:
 - input file path:  "../data/TC0_example.app_network_description"
@@ -23,23 +23,23 @@ This will invoke the programme with default parameters. Those are:
 Provide a valid path to an .app_network_description file. This file contains all the information needed to run the
 optimization. You can change this parameter by adding the following flag:
 ```bash
-java router/PathPlanner -in path/to/input/file
+java router.PathPlanner -in path/to/input/file
 ```
 #### Output File Path
 The result of the optimization is a number of routes for the traffic streams defined in the input file. They are written
 to an .xml file which is in accordance with the output format standards defined in the task description for this project.
 This file is saved to the output file path. You can change this parameter by adding the following flag:
 ```bash
-java router/PathPlanner -out path/to/output/file
+java router.PathPlanner -out path/to/output/file
 ```
 #### Constructive Metaheuristic
 This parameter defines how the initial solution is build. We provide a random solution builder ("rnd"), a breadth first
 search solution builder ("bfs"), and an A* based solution builder ("astar").
 You can change this parameter by adding the following flag:
 ```bash
-java router/PathPlanner -sb astar
-java router/PathPlanner -sb bfs
-java router/PathPlanner -sb rnd
+java router.PathPlanner -sb astar
+java router.PathPlanner -sb bfs
+java router.PathPlanner -sb rnd
 ```
 #### Iterative Metaheuristic
 This defines the optimization strategy. We have implemented a version of the simulated annealing metaheuristic ("sa")
@@ -47,15 +47,15 @@ and a genetic algorithm with tournament selection ("ga"). **The genetic algorith
 neighbourhood function**.
 You can change this parameter by adding the following flag:
 ```bash
-java router/PathPlanner -mh sa
-java router/PathPlanner -mh ga
+java router.PathPlanner -mh sa
+java router.PathPlanner -mh ga
 ```
 #### Runtime
 The stop criterion for the iterative optimization is time. Any postive integer value is a valid argument.
 You can change this parameter by adding the following flag:
 ```bash
-java router/PathPlanner -rt 5
-java router/PathPlanner -rt 300
+java router.PathPlanner -rt 5
+java router.PathPlanner -rt 300
 ...
 ```
 #### Neighbourhood Function
@@ -74,14 +74,14 @@ You can choose between these options:
 
 You can change this parameter by adding the following flag:
 ```bash
-java router/PathPlanner -nn -1
-java router/PathPlanner -nn 0
-java router/PathPlanner -nn 1
+java router.PathPlanner -nn -1
+java router.PathPlanner -nn 0
+java router.PathPlanner -nn 1
 ```
 
 ###Examples
 
 Run the genetic algorithm on the huge test file for 30 seconds with random initial solutions:
 ```
-java router/PathPlanner -rt 30 -in "../data/TC7_huge.app_network_description" -mh ga -sb rnd
+java router.PathPlanner -rt 30 -in "../data/TC7_huge.app_network_description" -mh ga -sb rnd
 ```
