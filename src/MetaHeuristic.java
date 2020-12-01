@@ -10,7 +10,10 @@ public abstract class MetaHeuristic {
     protected Architecture a;
     protected int nn;
     protected List<List<Integer>> bestSolution;
-
+    private enum neighbourhood_funcs {
+        GENERATE_SHORT,
+        GENERATE_SIMPLE
+    }
     public MetaHeuristic(Architecture a, int nn) {
         this.a = a;
         this.nn = nn;
@@ -240,6 +243,16 @@ public abstract class MetaHeuristic {
         return usedBandwidth;
     }
 
+//    /**
+//     *
+//     * @param solutions
+//     * @param numPaths
+//     * @return
+//     */
+//    public List<List<Integer>> generateNeighbourhood_simple(List<List<Integer>> solutions, Integer numPaths) {
+//
+//    }
+
     public ArrayList<Integer> BFS(Node src, Node dest, int[][] graph) {
 
         int numNodes = graph.length;
@@ -301,6 +314,7 @@ public abstract class MetaHeuristic {
         //Select route in current solution
 
         int[][] graph = new int[a.getGraph().length][a.getGraph()[0].length];
+
 
         //generate graph with overlap counter
 
