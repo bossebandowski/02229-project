@@ -19,7 +19,7 @@ class TestBench {
     private static final String timesPath = "../data/times.csv";
     private static final String runtime = "1";
     private static final String[] nns = {"-1", "0", "1"};
-    private static final String[] mhs = {"ga"}; //"sa",
+    private static final String[] mhs = {"sa", "ga"};
     private static final String[] sbs = {"rnd", "astar", "bfs"};
     private static final Map<String, Float> targetScores = new HashMap<>();
     private static final int runs = 2;
@@ -159,7 +159,7 @@ class TestBench {
         System.out.println("============");
         System.out.println("============");
         runtimeTest();
-        // targetScoreTest();
+        targetScoreTest();
     }
 }
 
