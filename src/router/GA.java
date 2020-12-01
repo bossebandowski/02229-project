@@ -13,9 +13,10 @@ public class GA extends MetaHeuristic
     List<List<List<Integer>>> _population;
     List<Float> _populationFitness;
     Random rand = new Random();
+    List<List<Integer>> solutionCopy;
 
 
-    public GA(Architecture architecture, int nn, int initPopulationSize, int normalPopulationSize, int numberOfChildren)
+    public GA(Architecture architecture, int nn, int initPopulationSize, int normalPopulationSize, int numberOfChildren,  List<List<Integer>> initSol)
     {
         super(architecture, nn);
         this._init_population_size = initPopulationSize;
@@ -23,7 +24,9 @@ public class GA extends MetaHeuristic
         this._number_of_children = numberOfChildren;
         this._sb = new RandomSolutionBuilder(this.a);
         this._population = new ArrayList<>();
-        _populationFitness = new ArrayList<>();
+        this._populationFitness = new ArrayList<>();
+        this.solutionCopy = new ArrayList<>();
+        solutionCopy.addAll(initSol);
         generateInitPopulation();
         calculateFitness();
     }
@@ -220,38 +223,47 @@ public class GA extends MetaHeuristic
             List<List<List<Integer>>> selectedParents = selectParents(_number_of_children);
             List<List<List<Integer>>> generatedChildren = generateChildren(selectedParents);
             List<List<List<Integer>>> selectedChildren = new ArrayList<>();
-            for(int i = 0; i < _populationSize / 2; i++)
+            if(_population.size() + generatedChildren.size() > _populationSize)
             {
-                int rand1 = rand.nextInt(_population.size());
-                _population.remove(rand1);
-                if(generatedChildren.size() == 0)
+                for(int i = 0; i < (_population.size() + generatedChildren.size()) - _populationSize; i++)
                 {
-                    int k = 0;
+                    if(_population.size() > 0)
+                    {
+                        int rand1 = rand.nextInt(_population.size());
+                        _population.remove(rand1);
+                    }
+                    int rand2 = rand.nextInt(generatedChildren.size());
+                    selectedChildren.add(generatedChildren.get(rand2));
                 }
-                int rand2 = rand.nextInt(generatedChildren.size());
-                selectedChildren.add(generatedChildren.get(rand2));
+                _population.addAll(selectedChildren);
             }
-            _population.addAll(selectedChildren);
+            else
+            {
+                selectedChildren.addAll(generatedChildren);
+            }
             prepareFinalSolution();
         }
-        prepareFinalSolution();
     }
 
     private void prepareFinalSolution()
     {
 
         List<List<Integer>> solution = new ArrayList<>();
-        float maxFitness = -1.0f;
+        float minFitness = Float.MAX_VALUE;
         for(List<List<Integer>> currentSolution:_population)
         {
             float costFunction = calculateCostFunction(currentSolution);
-            if(costFunction >= maxFitness)
+            if(costFunction <= minFitness)
             {
-                maxFitness = costFunction;
+                minFitness = costFunction;
                 solution = currentSolution;
             }
         }
-        System.out.println(maxFitness);
-        this.bestSolution = solution;
+        System.out.println(calculateCostFunction(solution));
+        if(calculateCostFunction(solutionCopy) > calculateCostFunction(solution))
+        {
+            solutionCopy = solution;
+            this.bestSolution = solution;
+        }
     }
 }
