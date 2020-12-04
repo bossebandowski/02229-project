@@ -17,13 +17,13 @@ class TestBench {
             "../data/TC7_huge.app_network_description"};
     private static final String scoresPath = "../data/scores.csv";
     private static final String timesPath = "../data/times.csv";
-    private static final String runtime = "1";
+    private static final String runtime = "5";
     private static final String[] nns = {"-1", "0", "1"};
     private static final String[] mhs = {"sa", "ga"};
     private static final String[] sbs = {"rnd", "astar", "bfs"};
     private static final Map<String, Float> targetScores = new HashMap<>();
-    private static final int runs = 2;
-    private static final String runtimeBound = "5";
+    private static final int runs = 20;
+    private static final String runtimeBound = "20";
     private static final float targetFactor = 1.01f;
 
     static void runtimeTest() throws IOException {
