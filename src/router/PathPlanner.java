@@ -81,7 +81,7 @@ public class PathPlanner {
         MetaHeuristic mh = null;
         switch (mhType) {
             case "sa":
-                mh = new SA(architecture, nn, 0.95f, 100, initSol);
+                mh = new SA(architecture, nn, 0.94f, 100, initSol, 10);
                 System.out.println("Initialising SA");
                 break;
             case "ga":

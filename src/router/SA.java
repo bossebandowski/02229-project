@@ -6,39 +6,52 @@ public class SA extends MetaHeuristic {
     private float alpha;
     private float t_start;
     private List<List<Integer>> solution;
+    private int TL;
 
 
-    public SA(Architecture a, int nn, float alpha, float t_start, List<List<Integer>> solution) {
+    public SA(Architecture a, int nn, float alpha, float t_start, List<List<Integer>> solution, int TL) {
         super(a, nn);
         this.alpha = alpha;
         this.t_start = t_start;
         this.solution = solution;
+        this.TL = TL; //iterations pr. temperature
     }
 
 
     @Override
-    public void run(int runtimeSeconds, float targetCost, long t0) {
-        float currentBestScore = Float.MAX_VALUE;
-        List<List<Integer>> s_i = solution;
+    public void run(int runtimeSeconds, float targetCost, long t0 ) {
+        List<List<Integer>> sCurrent = solution;
+        float currentBestScore = calculateCostFunction(sCurrent);
         float t = t_start;
         List<List<Integer>> next = null;
 
         while (((System.currentTimeMillis() - t0)/1000f < runtimeSeconds) && (targetCost < currentBestScore)) {
-            next = generateNeighborhood(s_i,1);
+            //iterations pr. temp
+            for (int i=0; i<TL; i++){
+                next = generateNeighborhood(sCurrent,nn);
 
-            float costCurrent = calculateCostFunction(s_i);
-            float costNext = calculateCostFunction(next);
+                float costCurrent = calculateCostFunction(sCurrent);
+                float costNext = calculateCostFunction(next);
 
-            float delta = costCurrent - costNext;
+                float delta = costCurrent - costNext;
 
-            if (delta > 0 || p(delta, t)) {
-                s_i = next;
-                t = t*alpha;
-                currentBestScore = costNext;
+                if (delta > 0 || p(delta, t)) {
+
+                    sCurrent = next;
+
+
+                    if (costNext < currentBestScore){
+                        currentBestScore = costNext;
+                        this.bestSolution = next;
+
+                    }
+                }
             }
-        }
 
-        this.bestSolution = s_i;
+            t = t*alpha;
+        }
+        System.out.println(currentBestScore);
+
     }
 
     private boolean p(float delta, float t) {
