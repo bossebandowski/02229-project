@@ -21,6 +21,7 @@ public class SA extends MetaHeuristic {
     @Override
     public void run(int runtimeSeconds, float targetCost, long t0 ) {
         List<List<Integer>> sCurrent = solution;
+        this.bestSolution = sCurrent;
         float currentBestScore = calculateCostFunction(sCurrent);
         float t = t_start;
         List<List<Integer>> next = null;
@@ -43,6 +44,7 @@ public class SA extends MetaHeuristic {
                     if (costNext < currentBestScore){
                         currentBestScore = costNext;
                         this.bestSolution = next;
+                        System.out.println(currentBestScore);
 
                     }
                 }
