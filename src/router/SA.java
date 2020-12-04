@@ -44,7 +44,6 @@ public class SA extends MetaHeuristic {
                     if (costNext < currentBestScore){
                         currentBestScore = costNext;
                         this.bestSolution = next;
-                        System.out.println(currentBestScore);
 
                     }
                 }
@@ -52,7 +51,7 @@ public class SA extends MetaHeuristic {
 
             t = t*alpha;
         }
-        System.out.println(currentBestScore);
+        
 
     }
 
