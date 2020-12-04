@@ -24,7 +24,7 @@ class TestBench {
     private static final Map<String, Float> targetScores = new HashMap<>();
     private static final int runs = 20;
     private static final String runtimeBound = "20";
-    private static final float targetFactor = 1.01f;
+    private static final float targetFactor = 1.05f;
 
     static void runtimeTest() throws IOException {
         TreeMap<Long, Float> res;
